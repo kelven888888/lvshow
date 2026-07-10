@@ -1,0 +1,128 @@
+
+{{define "main"}}
+<script charset="utf-8" src="/resource/kindeditor/kindeditor-all.js"></script>
+<script charset="utf-8" src="/resource/kindeditor/lang/zh-CN.js"></script>
+	<div class="x-body">
+		<form class="layui-form">
+			{{range .language}}
+	    <div class="layui-form-item">
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>{{.Name}}标题</label>
+				<div class="layui-input-block">
+					<input type="text" id="title" name="{{.Code}}" lay-verify="required" autocomplete="off" class="layui-input" value="{{language .Code $.result.Title}}">
+				</div>
+			</div>
+			{{end}}
+			{{range .language}}
+<div class="layui-form-item">
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>{{.Name}}内容</label>
+				<div class="layui-input-block">
+					<textarea id="content_{{.Code}}" name="content" class="layui-textarea" style="display: block;">{{language .Code $.result.Content}}</textarea>
+
+</textarea>
+
+
+				</div>
+			</div>
+			{{end}}
+<div class="layui-form-item">
+				<label class="layui-form-label">状态</label>
+				<div class="layui-input-inline">
+				{{if .IsUpdate}}<input type="radio" name="status" value="0" title="关闭"  {{if eqpoint .result.Status 0 }} checked {{end}}>
+<input type="radio" name="status" value="1" title="启用"  {{if eqpoint .result.Status 1 }} checked {{end}}>
+{{else}}	<input type = "radio" name = "status" value = "0" title = "关闭"  >
+	<input type = "radio" name = "status" value = "1" title = "启用"  checked>
+
+				{{end}}
+				</div>
+				</div><div class="layui-form-item">
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>排序</label>
+				<div class="layui-input-block">
+					<input type="text" id="orders" name="orders" lay-verify="required" autocomplete="off" class="layui-input" value="{{.result.Orders}}">
+				</div>
+			</div>
+
+
+
+			<div class="layui-form-item">
+				<input type="hidden" id="id" name="id" value="{{.result.Id}}">
+				<button  class="layui-btn" lay-filter="save" lay-submit="">
+					保存
+				</button>
+			</div>
+		</form>
+	</div>
+<script>
+
+	// 创建编辑器
+	KindEditor.ready(function (K) {
+		{{range .language}}
+		//var editor="editor_{{.Code}}"
+		editor = K.create("#content_{{.Code}}", {
+			designMode: true,
+			width:'800px',
+			height:'200px',
+			resizeType:0,
+			uploadJson: '../../public/uploadeditor', // 上传文件的服务器端处理程序
+			fileManagerJson: '../../public/uploadeditor', // 文件管理器的服务器端处理程序
+			allowFileManager: true, // 允许通过文件管理器查看服务器上的文件
+		});
+		editor.html({{language .Code $.result.Content}});
+
+		{{end}}
+	});
+
+
+</script>
+		<script>
+		window.onload = function() {
+			layui.use(['form', 'layer', 'upload','layedit'], function() {
+				$ = layui.jquery;
+
+				var form = layui.form
+						,layer = layui.layer,layedit =layui.layedit;
+				
+				// 监听提交
+				form.on('submit(save)', function(data) {
+					let params = {};
+
+					$("input[id='title']").each(function(index, value){
+
+						//alert($(this).val())
+						params[value.name] = value.value;
+
+
+					})
+					let paramsde = {};
+					$("textarea[name='content']").each(function(index, value){
+
+						var key=value.id.replace("content_","")
+
+						html=KindEditor.instances[index].html()
+						//	console.log(html)
+
+						//	console.log("editor_"+key,val)
+						paramsde[key] = html;
+
+
+
+					})
+					var jsonData = JSON.stringify(params);
+					data.field.title =jsonData
+					var jsonDatade = JSON.stringify(paramsde);
+					data.field.content=jsonDatade;
+					console.log(data.field.title )
+					console.log(data.field.content)
+					ajax_post("{{.PostUrl}}", data.field, load_page, true, true, true);
+					return false;
+				});
+			}); $("#btn-search").click(function () {
+            var query = $('.x-search-form').serialize();
+            console.log(query)
+            load_page({{urlfor "admin.BannerController.Index"}} + '?' + query);
+        });
+		}
+	</script>
+
+</body>
+{{end}}
+

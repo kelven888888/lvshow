@@ -1,0 +1,135 @@
+{{define "main"}}
+
+<div class="x-body" >
+
+    <form class="layui-form">
+        {{range $item := .language}}
+            <div class="layui-form-item">
+                <label class="layui-form-label">产品名称-{{$item.Name}}</label>
+                <div class="layui-input-block">
+                    <!--Earn bond yields the automatic way-->
+                    <input type="text" name="name_{{$item.Code}}"  placeholder="基金名称" autocomplete="off" class="layui-input" value="{{StringMap2Value $.config.Name $item.Code }}">
+                </div>
+            </div>
+        {{end}}
+        {{range $item := .language}}
+            <div class="layui-form-item">
+                <label class="layui-form-label">描述1-{{$item.Name}}</label>
+                <div class="layui-input-block">
+                    <!--Blended 30-day SEC yield,after advisory fee as of 05/08/24-->
+                    <input type="text" name="description_top_{{$item.Code}}"  placeholder="描述1" autocomplete="off" class="layui-input" value="{{StringMap2Value $.config.DescriptionTop $item.Code }}">
+                </div>
+            </div>
+        {{end}}
+        {{range $item := .language}}
+            <div class="layui-form-item">
+                <label class="layui-form-label">描述2-{{$item.Name}}</label>
+                <div class="layui-input-block">
+                    <!--Total returns since inception (5/01/24):6.11%-->
+                    <input type="text" name="description_bottom_{{$item.Code}}"  placeholder="描述2" autocomplete="off" class="layui-input" value="{{StringMap2Value $.config.DescriptionBottom $item.Code }}">
+                </div>
+            </div>
+        {{end}}
+        <div class="layui-form-item">
+            <label class="layui-form-label">年化率</label>
+            <div class="layui-input-inline">
+                <input type="text" name="annual_interest_rate" lay-verify="required" placeholder="年化率" autocomplete="off" class="layui-input"  value="{{.config.AnnualInterestRate}}">
+            </div>
+            <div class="layui-form-mid layui-text-em">1为100%; 年化率6.25% = 0.0625</div>
+            <button type="button" class="layui-btn layui-btn-primary" id="calc_output_rate">计算</button>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">年化率偏移量</label>
+            <div class="layui-input-inline">
+                <input type="text" name="offset_output_rate" lay-verify="required" placeholder="年化率" autocomplete="off" class="layui-input"  value="{{.config.OffsetOutputRate}}">
+            </div>
+            <div class="layui-form-mid layui-text-em">1为100%; 0.001为偏移千分之一, 注意手动修改后请点击上面计算出每日产出比例</div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">产出比例</label>
+            <div class="layui-input-inline">
+                <input type="text" name="output_rate" lay-verify="required" placeholder="产出比例" autocomplete="off" class="layui-input"  value="{{.config.OutputRate}}">
+            </div>
+            <div class="layui-form-mid layui-text-em">1为100%; 周期（24小时）内产出比例，计算公式：6.25（年利息）/100（本金）/252（持有天数）</div>
+        </div>
+<!--        <label class="layui-form-label">投资上线</label>-->
+<!--        <div class="layui-input-block">-->
+<!--            <input type="text" name="name" lay-verify="required" placeholder="基金名称" autocomplete="off" class="layui-input">-->
+<!--        </div>-->
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button type="submit" class="layui-btn" lay-submit lay-filter="financeConfig">立即提交</button>
+            </div>
+        </div>
+    </form>
+
+</div>
+
+<script>
+    window.onload = function () {
+        layui.use(['form', 'laydate', 'util'], function(){
+            var $ = layui.jquery;        // jquery
+            var form = layui.form;
+            var layer = layui.layer;
+
+            $("#calc_output_rate").click(() => {
+                let annualInterestRate = $("input[name=annual_interest_rate]").val()
+                let offsetOutputRate = $("input[name=offset_output_rate]").val()
+                let _annualInterestRate = parseFloat(annualInterestRate)+parseFloat(offsetOutputRate)
+                $("input[name=output_rate]").val((_annualInterestRate/252).toFixed(6))
+            })
+
+            form.on('submit(financeConfig)', (data) => {
+
+                const field = {...data.field}; // 获取表单字段值
+
+                let name = {}
+                {{range $item := .language}}
+                name['{{$item.Code}}'] = data.field['name_{{$item.Code}}']
+                {{end}}
+
+                let description_top = {}
+                {{range $item := .language}}
+                description_top['{{$item.Code}}'] = data.field['description_top_{{$item.Code}}']
+                {{end}}
+
+                let description_bottom = {}
+                {{range $item := .language}}
+                description_bottom['{{$item.Code}}'] = data.field['description_bottom_{{$item.Code}}']
+                {{end}}
+
+                field.name = name;
+                field.description_top = description_top;
+                field.description_bottom = description_bottom;
+
+                console.log(field)
+                $.ajax({
+                    method: "post",
+                    url: '{{urlfor "admin.FinanceController.Config"}}',
+                    dataType: "json",
+                    data: JSON.stringify(field),
+                    contentType: "application/json",
+                    success: (res) =>{
+                        console.log(res)
+                        if (res.code !== 200) {
+                            layer.msg(res.msg)
+                        }else{
+                            layer.msg(res.msg)
+                        }
+                    }
+                })
+                // let field = data.field;
+                // console.log(field)
+                // ajax_post("{{urlfor "admin.FinanceController.Config"}}", data.field, load_page, true, false, true);
+
+                // $.post("{{urlfor "admin.FinanceController.Config"}}", field, (res) => {
+                //     console.log(res)
+                // })
+                return false
+            })
+
+        })
+    }
+
+</script>
+{{end}}

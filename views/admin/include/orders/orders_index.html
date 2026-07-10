@@ -1,0 +1,220 @@
+
+{{define "main"}}
+
+<body class="x-iframe-body">
+
+
+<div class="x-body">
+        <div class="layui-card">
+         <form class="layui-form x-center x-search-form" style="width:80%">
+                        <div class="layui-form-pane" style="margin-top: 15px;">
+                            <div class="layui-form-item">
+
+                                <div class="layui-inline">
+                                    <label class="layui-form-label">关键字</label>
+                                    <div class="layui-input-inline">
+
+                                       <input type="text" name="kw" placeholder="请输入关键字" autocomplete="off" class="layui-input" value="{{.Search.kw}}">
+                                    </div>
+                                </div>
+                                <div class="layui-inline"> <label class="layui-form-label">范围</label>
+                                    <div class="layui-input-inline">
+                                        <select name="search_field" lay-verify="required" lay-search="">
+                                            <option value="">直接选择</option>
+
+                                              <option  value="user_id_sell" {{if eq .Search.search_field "user_id_sell"}}selected{{end}}>出售会员ID</option>
+   <option  value="user_id_buy" {{if eq .Search.search_field "user_id_buy"}}selected{{end}}>购买会员ID</option>
+   <option  value="order_sn" {{if eq .Search.search_field "order_sn"}}selected{{end}}>订单号</option>
+   <option  value="total_amount" {{if eq .Search.search_field "total_amount"}}selected{{end}}>总价</option>
+   <option  value="pay_amount" {{if eq .Search.search_field "pay_amount"}}selected{{end}}>支付金额</option>
+   <option  value="status" {{if eq .Search.search_field "status"}}selected{{end}}>状态</option>
+   <option  value="pay_time" {{if eq .Search.search_field "pay_time"}}selected{{end}}>成交时间</option>
+   <option  value="user_name_sell" {{if eq .Search.search_field "user_name_sell"}}selected{{end}}>出售用户</option>
+
+                                            <option  value="user_name_buy" {{if eq .Search.search_field "user_name_buy"}}selected{{end}}>购买用户</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+
+
+                                <div class="layui-inline">
+                                    <div class="layui-input-inline" style="width:80px">
+                                        <button type="button" class="layui-btn" id="btn-search"><i class="layui-icon">&#xe615;</i></button>
+                                    </div>
+                                </div>
+                                  <div class="layui-inline">
+                                                            <div class="layui-input-inline" style="width:80px">
+                                                                <button type="reset" class="layui-btn layui-btn-primary" id="reset">重置</button>
+                                                            </div>
+                                                        </div>
+                            </div>
+                        </div>
+
+                    </form>
+            <xblock>
+              <xblock>
+                <button class="layui-btn layui-btn-danger" onclick="del_all()"><i class="layui-icon">&#xe640;</i>批量删除</button>
+                <button class="layui-btn" onclick="x_admin_show('添加banner', '{{urlfor "admin.OrdersController.Add"}}')"><i class="layui-icon">&#xe608;</i>添加</button>
+                <span class="x-right" style="line-height:40px">共有数据：{{.Count}} 条</span>
+            </xblock>
+            </xblock>
+            <table class="layui-table layui-form">
+                <thead>
+                    <tr>
+
+                       <th style="width: 30px"><input type="checkbox" lay-skin="primary" lay-filter="all-select"></th>
+                        <th>ID</th>
+                        <th>创建时间</th>
+                      <th>出售会员ID</th>
+                        <th>出售用户</th>
+<th>购买会员ID</th>
+                        <th>购买用户</th>
+<th>订单号</th>
+<th>总价</th>
+                        <th>商品总类</th>
+                        <th>商品总个数</th>
+
+<th>支付金额</th>
+<th>状态</th>
+<th>成交时间</th>
+
+
+                       <td>操作</td>
+                    </tr>
+                </thead>
+                <tbody id="x-img">
+              {{range .List}}
+                    <tr>
+                        <td><input type="checkbox" lay-skin="primary" value="{{.Id}}" class="all-x-select"></td>
+                        <td>{{.Id}}</td>
+                        <td>{{.CreatedAt}}</td>
+                        <td>{{.UserIdSell}}</td>
+                        <td>{{.UserNameSell}}</td>
+<td>{{.UserIdBuy}}
+                        <td>{{.UserNameBuy}}</td>
+
+<td>{{.OrderSn}}</td>
+<td>{{.TotalAmount}}</td>
+                        <td>{{.TotalProductQty}}</td>
+                        <td>{{.TotalQty}}</td>
+<td>{{.PayAmount}}</td>
+<td>
+<!--    0-带成交, 1-已支付, 2-已发货, 3-已完成, 4-已取消-->
+    {{if eqpoint .Status 0}}
+    待成交
+
+    {{end}}
+    {{if eqpoint .Status 1}}
+    已支付
+
+    {{end}}
+    {{if eqpoint .Status 2}}
+    已发货
+
+    {{end}}
+    {{if eqpoint .Status 3}}
+    已完成
+
+    {{end}}
+
+    {{if eqpoint .Status 4}}
+    已取消
+
+    {{end}}
+
+
+</td>
+<td>{{.PayTime}}</td>
+
+ <td class="td-manage">
+                            <a href="javascript:;" onclick="x_admin_show('编辑', {{urlfor "admin.OrdersController.Edit" "id" .Id}})" class="layui-btn layui-btn-xs layui-btn-normal">
+                            <i class="layui-icon">&#xe642;</i>编辑
+                            </a>
+     <a href="javascript:;" onclick="x_admin_show('查看商品', {{urlfor "admin.OrdersController.Detail" "order_id" .Id}})" class="layui-btn layui-btn-xs layui-btn-normal">
+     <i class="layui-icon">&#xe705;</i>查看商品
+                            <a class="layui-btn layui-btn-xs layui-btn-danger" href="javascript:;" onclick="del(this,'{{.Id}}')">
+                                <i class="layui-icon">&#xe640;</i>删除
+                            </a>
+
+                        </td> </tr>
+                {{end}}
+
+                </tbody>
+            </table>
+            <div id="page"></div>
+        </div>
+	</div>
+	<script>
+		window.onload = function() {
+			layui.use(['layer', 'form' ,'laypage', 'form'], function() {
+				$ = layui.jquery; //jquery
+				layer = layui.layer; //弹出层
+                var laypage = layui.laypage; // 分页
+                form=layui.form
+                // 分页
+                laypage.render({
+                    elem: 'page',
+                    count: {{.Count}},
+                limit: {{.Search.limit}},
+                curr:  {{.Search.page}},
+                prev: '<em><</em>',
+                    next: '<em>></em>',
+                    skip: false,
+                    jump: function (obj, first) {
+                    if (first != true) {
+                        var query = $('.x-search-form').serialize();
+                        query += "&page=" + obj.curr;
+
+                        //  load_page({{urlfor "admin.RoleController.Index"}} + "?" + query,"son");
+                        window.location.href={{urlfor "admin.OrdersController.Index"}} + "?" + query
+                        //layui.admin.tabsBody(layui.admin.tabsPage.index).find(".layadmin-iframe")
+                        // layui.admin.url .tabsBodyChange({{urlfor "admin.RoleController.Index"}} + "?" + query)
+                    }
+                }
+            });
+
+				layer.ready(function() { //为了layer.ext.js加载完毕再执行
+					layer.photos({
+						photos: '#x-img'
+						//,shift: 5 //0-6的选择，指定弹出图片动画类型，默认随机
+					});
+				});
+			});
+            $('#resetBtn').on('click', function(){
+                // 使用form模块的resetField方法来重置表单
+                form.resetField('myForm');
+            });
+		}
+
+		// 批量删除提交
+		function del_all() {
+			parent.layer.confirm('确认要删除吗？', function(index) {
+                var ids = get_list_ids('all-x-select');
+				// 发异步删除数据
+				ajax_post({{urlfor "admin.OrdersController.DeleteBatch"}}, {ids: ids}, false,true, false, true);
+			});
+		}
+
+		// 删除
+		function del(obj, id, name) {
+            parent.layer.confirm('确认要删除吗？', function(index) {
+				$(obj).parents("tr").remove();
+
+				//发异步删除数据
+				ajax_post({{urlfor "admin.OrdersController.Delete"}}, {id: id, name: name}, reload_page);
+			});
+		}
+        $("#btn-search").click(function () {
+            var query = $('.x-search-form').serialize();
+            console.log(query)
+            load_page({{urlfor "admin.OrdersController.Index"}} + '?' + query);
+        });
+        $("#reset").click(function () {
+            load_page({{urlfor "admin.OrdersController.Index"}} + '?' );
+        });
+
+    </script>
+</body>
+{{end}}
+

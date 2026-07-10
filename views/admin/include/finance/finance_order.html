@@ -1,0 +1,141 @@
+{{define "main"}}
+<style type="text/css">
+    .fix-table{table-layout: fixed;}
+    .fix-table td {white-space: nowrap; /* 自适应宽度*/overflow:hidden;text-overflow:ellipsis;/*省略号显示*/}
+</style>
+<!--<div class="x-body" >-->
+    <form class="layui-form x-center x-search-form" style="width:80%">
+        <div class="layui-form-pane" style="margin-top: 15px;">
+            <div class="layui-form-item">
+                <!--          <label class="layui-form-label">日期范围</label>-->
+                <!--          <div class="layui-input-inline">-->
+                <!--            <input type="text" class="layui-input" id="date-range" value="{{.Search.st}} - {{.Search.et}}">-->
+                <!--            <input type="hidden" class="layui-input" name="st" value="{{.Search.st}}">-->
+                <!--            <input type="hidden" class="layui-input" name="et" value="{{.Search.et}}">-->
+                <!--          </div>-->
+                <div class="layui-inline">
+                    <label class="layui-form-label">用户名</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="username" placeholder="请输入用户名" autocomplete="off" class="layui-input" value="{{.req.Username}}">
+                    </div>
+                </div>
+                <div class="layui-inline"> <label class="layui-form-label">状态</label>
+                    <div class="layui-input-inline">
+                        <select name="status" lay-verify="required" lay-search="">
+                            <option value="">直接选择或搜索选择</option>
+                            <option value="1" {{if eq 1 .req.Status}}selected{{end}}>进行中</option>
+                            <option value="2"  {{if eq 2 .req.Status}}selected{{end}}>已结单</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="layui-inline">
+                    <div class="layui-input-inline" style="width:80px">
+                        <button type="button" class="layui-btn" id="btn-search"><i class="layui-icon">&#xe615;</i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="layui-card">
+<!--        <div class="layui-card-header">理财订单</div>-->
+        <div class="layui-card-body">
+            <table class="layui-table">
+                <colgroup>
+
+                </colgroup>
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>用户ID</th>
+                    <th>锁定金额</th>
+                    <th>产出比例</th>
+                    <th>产出金额</th>
+                    <th>产出次数</th>
+                    <td>状态</td>
+                    <td>创建时间</td>
+                    <td>更新时间</td>
+                    <td>操作</td>
+                </tr>
+                </thead>
+                <tbody>
+                {{range $value := .orderList}}
+                    <tr>
+                        <td>{{$value.Id}}</td>
+                        <td>{{$value.Username}}(id:{{$value.UserId}})</td>
+                        <td>{{$value.LockAmount}}</td>
+                        <td>{{$value.OutputRate}}</td>
+                        <td>{{$value.OutputAmount}}</td>
+                        <td>
+                            {{$value.OutputCount}}
+                        </td>
+                        <td>
+                            {{ if eq 1 $value.Status }}
+                                进行中
+                            {{ end}}
+                            {{ if eq 2 $value.Status }}
+                                已结单
+                            {{ end}}
+                        </td>
+                        <td>{{Formatdatetime $value.CreateTime}}</td>
+                        <td>{{Formatdatetime $value.UpdateTime}}</td>
+                        <td>
+                            <div class="layui-btn-container">
+                                <button  onclick="x_admin_show('添加banner', '{{urlfor "admin.FinanceController.Log"}}?order_id={{$value.Id}}')" class="layui-btn">查看查出日志</button>
+                            </div>
+                        </td>
+                    </tr>
+                {{end}}
+                </tbody>
+            </table>
+            <div id="page"></div>
+        </div>
+    </div>
+<!--</div>-->
+<script>
+    window.onload = function () {
+        layui.use(['element', 'layer', 'laydate', 'laypage', 'form'], function() {
+            var $ = layui.jquery;        // jquery
+            var laypage = layui.laypage; // 分页
+            var layer = layui.layer;
+
+            // 分页
+            laypage.render({
+                elem: 'page',
+                count: {{.req.Count}},
+                limit: {{.req.Limit}},
+                curr:  {{.req.Page}},
+                prev: '<em><</em>',
+                next: '<em>></em>',
+                skip: false,
+                jump: function (obj, first) {
+                    if (first != true) {
+                        var query = $('.x-search-form').serialize();
+                        query += "&page=" + obj.curr;
+
+                        //  load_page({{urlfor "admin.RoleController.Index"}} + "?" + query,"son");
+                        window.location.href={{urlfor "admin.FinanceController.Order"}} + "?" + query
+                        //layui.admin.tabsBody(layui.admin.tabsPage.index).find(".layadmin-iframe")
+                        // layui.admin.url .tabsBodyChange({{urlfor "admin.RoleController.Index"}} + "?" + query)
+                    }
+                }
+            })
+
+            $("#btn-search").click(() =>{
+                var query = $('.x-search-form').serialize();
+                console.log(query)
+                load_page({{urlfor "admin.FinanceController.Order"}} + '?' + query);
+            })
+
+            $("#logBtn").click(() =>{
+                layer.open({
+                    type:1,
+
+                })
+            })
+        })
+    }
+
+</script>
+{{end}}

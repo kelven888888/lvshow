@@ -1,0 +1,179 @@
+{{define "main"}}
+<style type="text/css">
+    .fix-table{table-layout: fixed;}
+    .fix-table td {white-space: nowrap; /* 自适应宽度*/overflow:hidden;text-overflow:ellipsis;/*省略号显示*/}
+</style>
+<form class="layui-form x-center x-search-form" style="width:80%">
+    <div class="layui-form-pane" style="margin-top: 15px;">
+        <div class="layui-form-item">
+            <div class="layui-inline"> <label class="layui-form-label">账户</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="username" lay-verify="required" placeholder="账户" autocomplete="off" class="layui-input" value="{{.req.UserName}}">
+                </div>
+            </div>
+            <div class="layui-inline"> <label class="layui-form-label">分组</label>
+                <div class="layui-input-inline">
+                    <select name="group" lay-filter="groupType">
+                        <option value="">选择</option>
+                        {{range $value := .groupOption}}
+                        <option value="{{$value.Value}}" >{{$value.Name}}</option>
+                        {{end}}
+                    </select>
+                </div>
+            </div>
+            <div class="layui-inline"> <label class="layui-form-label">类型</label>
+                <div class="layui-input-inline">
+                    <select name="type" lay-filter="chooseType">
+                        <option value="">选择</option>
+                        {{range $value := .typeOption}}
+                        <option value="{{$value.Value}}" >{{$value.Name}}</option>
+                        {{end}}
+                    </select>
+                </div>
+            </div>
+
+            <div class="layui-inline">
+                <div class="layui-input-inline" style="width:80px">
+                    <button type="button" class="layui-btn" id="btn-search"><i class="layui-icon">&#xe615;</i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+<div class="layui-card">
+    <div class="layui-card-body">
+        <button type="button" class="layui-btn" onclick="x_admin_show('添加消息', '{{urlfor "admin.AccountMessageController.Edit"}}')">添加</button>
+    </div>
+</div>
+<div class="layui-card">
+    <!--        <div class="layui-card-header">理财订单</div>-->
+    <div class="layui-card-body">
+        <table class="layui-table">
+            <colgroup>
+
+            </colgroup>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>分组</th>
+                <th>类型</th>
+                <th>用户名</th>
+                <th>标题</th>
+                <td>内容</td>
+                <td>扩展项</td>
+                <td>操作</td>
+            </tr>
+            </thead>
+            <tbody>
+            {{range $value := .list}}
+            <tr>
+                <td>{{$value.Id}}</td>
+                <td>{{if $value.Group}}
+                        {{if $value.GroupOption}}
+                            {{$value.GroupOption.Name}}
+                        {{else}}
+                            {{$value.Group}}
+                        {{end}}
+                    {{else}}
+                        -
+                    {{end}}
+                </td>
+                <td>{{if $value.Type}}
+                        {{if $value.TypeOption}}
+                            {{$value.TypeOption.Name}}
+                        {{else}}
+                            {{$value.Type}}
+                        {{end}}
+                    {{else}}
+                    -
+                    {{end}}
+                </td>
+                <td>
+                    {{if eq "" $value.Username}}
+                    -
+                    {{else}}
+                        {{$value.Username}}
+                    {{end}}
+                </td>
+                <td>{{$value.Title}}</td>
+                <td>{{$value.Content}}</td>
+                <td>{{Map2Json $value.Extends}}</td>
+                <td>
+                    <div class="layui-btn-container">
+                        {{if $value.Type}}{{if Cmp $value.Type 0 }}<button onclick="x_admin_show('修改', '{{urlfor "admin.AccountMessageController.Edit"}}?id={{$value.Id}}')" class="layui-btn">修改</button>{{end}}{{end}}
+                        {{if $value.Type}}{{if Cmp $value.Type 1 }}<button onclick="x_admin_show('修改', '{{urlfor "admin.AccountMessageController.Edit"}}?id={{$value.Id}}')" class="layui-btn">修改</button>{{end}}{{end}}
+                        <button onclick="account_message_del(this, {{$value.Id}})" class="layui-btn layui-btn-danger">删除</button>
+                    </div>
+                </td>
+            </tr>
+            {{end}}
+            </tbody>
+        </table>
+        <div id="page"></div>
+    </div>
+</div>
+<!--</div>-->
+<script>
+    window.onload = function () {
+        layui.use(['element', 'layer', 'laydate', 'laypage', 'form', 'util'], function() {
+            var $ = layui.jquery;        // jquery
+            var laypage = layui.laypage; // 分页
+            var layer = layui.layer;
+            var form = layui.form;
+
+            // 分页
+            laypage.render({
+                elem: 'page',
+                count: {{.req.Count}},
+            limit: {{.req.Limit}},
+            curr:  {{.req.Page}},
+            prev: '<em><</em>',
+                next: '<em>></em>',
+                skip: false,
+                jump: function (obj, first) {
+                if (first != true) {
+                    var query = $('.x-search-form').serialize();
+                    query += "&page=" + obj.curr;
+
+                    //  load_page({{urlfor "admin.RoleController.Index"}} + "?" + query,"son");
+                    window.location.href={{urlfor "admin.AccountMessageController.List"}} + "?" + query
+                    //layui.admin.tabsBody(layui.admin.tabsPage.index).find(".layadmin-iframe")
+                    // layui.admin.url .tabsBodyChange({{urlfor "admin.RoleController.Index"}} + "?" + query)
+                }
+            }
+        })
+
+            $("#btn-search").click(() =>{
+                var query = $('.x-search-form').serialize();
+                console.log(query)
+                load_page({{urlfor "admin.AccountMessageController.List"}} + '?' + query);
+            })
+
+            util()
+
+            // $("#delete").click(() => {
+            //
+            // })
+            // var deleteFn = function(id) {
+            //     console.log(id)
+            // }
+        })
+    }
+
+    /*-删除*/
+    function account_message_del(obj, id) {
+        parent.layer.confirm('确认要删除吗？', function(index) {
+
+            // 发异步删除数据
+            ajax_post_by_fn({{urlfor "admin.AccountMessageController.Delete"}}, {id: id}, false, true, false, true, function (res) {
+                console.log(res)
+                if (res.code == 200){
+                    $(obj).parents("tr").remove();
+                }
+            });
+
+        });
+    }
+
+</script>
+{{end}}

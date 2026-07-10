@@ -1,0 +1,201 @@
+
+{{define "main"}}
+
+	<div class="x-body">
+		<form class="layui-form">
+			<div class="layui-form-item">
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>类型</label>
+				<div class="layui-input-inline">
+					{{if .IsUpdate}}
+					<input type="radio" name="type" value="1" title="虚拟货币"  {{if eqpoint .result.Type 1 }} checked {{end}} >
+					<input type="radio" name="type" value="2" title="银行卡"  {{if eqpoint .result.Type 2 }}  checked {{end}} >
+
+					{{else}}
+					<input type="radio" name="type" value="1" title="虚拟货币"  >
+					<input type="radio" name="type" value="2" title="银行卡"  checked >
+
+					{{end}}
+				</div>
+			</div>
+			{{range .language}}
+			<div class="layui-form-item">
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>{{.Name}}币名称<br>银行卡名称</label>
+				<div class="layui-input-block">
+					<input type="text" id="title" name="{{.Code}}" autocomplete="off" class="layui-input" value="{{language .Code $.result.Title}}">
+				</div>
+				<div class="layui-input-block" style="text-align: left">
+					(显示名称)类型虚拟货币就币名称,银行卡就银行卡名称
+				</div>
+			</div>
+			{{end}}
+			<div class="layui-form-item">
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>标签(key)</label>
+				<div class="layui-input-block">
+					<input type="text" id="label" name="label" autocomplete="off" class="layui-input" value="{{.result.Label}}">
+				</div>
+				<div class="layui-input-block" style="text-align: left">
+					<span style="color:red">慎改</span>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>账户名</label>
+				<div class="layui-input-block">
+					<input type="text" id="label" name="account" autocomplete="off" class="layui-input" value="{{.result.Account}}">
+				</div>
+				<div class="layui-input-block" style="text-align: left">
+					<span style="color:red">银行卡必填</span>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>链</label>
+				<div class="layui-input-block">
+					<input type="text" id="chain" DISABLED name="chain"  autocomplete="off" class="layui-input" value="{{.result.Chain}}">
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>充值地址<br>银行卡账号</label>
+				<div class="layui-input-block">
+					<input type="text" id="address" name="address" autocomplete="off" class="layui-input" value="{{.result.Address}}">
+				</div>
+				<div class="layui-input-block" style="text-align: left">
+					类型虚拟货币就虚拟地址,银行卡银行卡账号
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>提现手续费</label>
+				<div class="layui-input-block">
+					<input type="text" id="withdraw_fee" name="withdraw_fee" autocomplete="off" class="layui-input" value="{{.result.WithdrawFee}}">
+				</div>
+				<div class="layui-input-block" style="text-align: left">
+					类型虚拟货币就虚拟货币数量,银行卡就RM数量
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>最小提现<br>限制</label>
+				<div class="layui-input-block">
+					<input type="text" id="min_withdraw_amount" name="min_withdraw_amount"  autocomplete="off" class="layui-input" value="{{.result.MinWithdrawAmount}}">
+
+				</div>
+				<div class="layui-input-block" style="text-align: left">
+					类型虚拟货币就虚拟货币数量,银行卡就RM数量
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>最小充值<br>限制</label>
+				<div class="layui-input-block">
+					<input type="text" id="min_recharge_amount" name="min_recharge_amount"  autocomplete="off" class="layui-input" value="{{.result.MinRechargeAmount}}">
+
+				</div>
+				<div class="layui-input-block" style="text-align: left">
+					类型虚拟货币就虚拟货币数量,银行卡就RM数量
+				</div>
+			</div>
+
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">提币状态</label>
+				<div class="layui-input-inline">
+					{{if .IsUpdate}}
+					<input type="radio" name="statuswithdraw" value="0" title="禁用"  {{if eqpoint .result.Statuswithdraw 0 }} checked {{end}} >
+					<input type="radio" name="statuswithdraw" value="1" title="启用"  {{if eqpoint .result.Statuswithdraw 1 }}  checked {{end}} >
+
+					{{else}}
+					<input type="radio" name="statuswithdraw" value="0" title="禁用"  >
+					<input type="radio" name="statuswithdraw" value="1" title="启用"  checked >
+					{{end}}
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">充值状态</label>
+				<div class="layui-input-inline">
+					{{if .IsUpdate}}
+					<input type="radio" name="statusrecharge" value="0" title="禁用"  {{if eqpoint .result.Statusrecharge 0 }} checked {{end}} >
+					<input type="radio" name="statusrecharge" value="1" title="启用"  {{if eqpoint .result.Statusrecharge 1 }}  checked {{end}} >
+
+					{{else}}
+					<input type="radio" name="statusrecharge" value="0" title="禁用"  >
+					<input type="radio" name="statusrecharge" value="1" title="启用"  checked >
+					{{end}}
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label  class="layui-form-label"><span class="x-red">*</span>图标</label>
+				<div class="layui-input-inline">
+					<img id="LAY_upload" width="150"
+						 {{if .IsUpdate}}
+						 src="../../{{.result.Icon}}"
+						 {{end}}
+					>
+					<input type="hidden" id="upload_cover" name="icon" value="{{.result.Icon}}">
+				</div>
+
+				<div class="layui-input-inline">
+					<div class="site-demo-upbar">
+						<button type="button" class="layui-btn layui-btn-primary" id="upimg">
+							<i class="layui-icon">&#xe67c;</i>上传图片
+						</button>
+					</div>
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<input type="hidden" id="id" name="id" value="{{.result.Id}}">
+				<button  class="layui-btn" lay-filter="save" lay-submit="">
+					保存
+				</button>
+			</div>
+		</form>
+	</div>
+		<script>
+		window.onload = function() {
+			layui.use(['form', 'layer', 'upload'], function() {
+				$ = layui.jquery;
+
+				var form = layui.form
+					,layer = layui.layer;
+
+				//图片上传接口
+				layui.upload.render({
+					elem: '#upimg',
+					field: 'file',
+					url: {{urlfor "PublicController.Upload?type=banner"}},
+				done: function(res) { //上传成功后的回调
+					if (res.code == 200) {
+						$('#LAY_upload').attr('src',"../../"+ res.data.url);
+						$('#upload_cover').val(res.data.url);
+					} else {
+						layer.msg(res.msg, {icon: 3});
+					}
+				}
+			});
+
+				// 监听提交
+				form.on('submit(save)', function(data) {
+					let params = {};
+
+					$("input[id='title']").each(function(index, value){
+
+						//alert($(this).val())
+						params[value.name] = value.value;
+
+
+					})
+					var jsonData = JSON.stringify(params);
+					data.field.title =jsonData
+					ajax_post("{{.PostUrl}}", data.field, load_page, true, true, true);
+					return false;
+				});
+			}); $("#btn-search").click(function () {
+            var query = $('.x-search-form').serialize();
+            console.log(query)
+            load_page({{urlfor "admin.BannerController.Index"}} + '?' + query);
+        });
+		}
+	</script>
+
+</body>
+{{end}}
+

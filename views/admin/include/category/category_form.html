@@ -1,0 +1,92 @@
+
+{{define "main"}}
+
+	<div class="x-body">
+		<form class="layui-form">
+			<div class="layui-form-item">
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>上级类别</label>
+				<div class="layui-input-block">
+					<select name="pid" lay-verify="required" lay-search="">
+						<option value="0">顶级</option>
+						{{range .category}}
+						<option  value="{{.Id}}" {{if eq $.result.Pid  .Id}}selected{{end}}> {{language "zh-hant" .Name}} </option>
+
+						{{end}}
+
+					</select>
+				</div>
+			</div>
+			{{range .language}}
+	    <div class="layui-form-item">
+
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>{{.Name}}名称</label>
+				<div class="layui-input-block">
+					<input type="text" id="name" name="{{.Code}}" lay-verify="required" autocomplete="off" class="layui-input" value="{{language .Code $.result.Name}}">
+				</div>
+
+			</div>
+			{{end}}
+<div class="layui-form-item">
+				<label class="layui-form-label">状态</label>
+				<div class="layui-input-inline">
+				{{if .IsUpdate}}<input type="radio" name="state" value="0" title="未启用"  {{if eqpoint .result.State 0 }} checked {{end}}>
+<input type="radio" name="state" value="1" title="已启用"  {{if eqpoint .result.State 1 }} checked {{end}}>
+{{else}}	<input type="radio" name = "state" value = "0" title = "未启用"  checked>
+	<input type="radio" name = "state" value = "1" title = "已启用"  checked>
+
+				{{end}}
+				</div>
+				</div><div class="layui-form-item">
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>排序</label>
+				<div class="layui-input-block">
+					<input type="text" id="sort" name="sort" lay-verify="required" autocomplete="off" class="layui-input" value="{{.result.Sort}}">
+				</div>
+			</div>
+
+
+
+			<div class="layui-form-item">
+				<input type="hidden" id="id" name="id" value="{{.result.Id}}">
+				<button  class="layui-btn" lay-filter="save" lay-submit="">
+					保存
+				</button>
+			</div>
+		</form>
+	</div>
+		<script>
+		window.onload = function() {
+			layui.use(['form', 'layer', 'upload'], function() {
+				$ = layui.jquery;
+
+				var form = layui.form
+					,layer = layui.layer;
+  
+				
+				// 监听提交
+				form.on('submit(save)', function(data) {
+					let params = {};
+
+					$("input[id='name']").each(function(index, value){
+
+						//alert($(this).val())
+						params[value.name] = value.value;
+
+
+					})
+					var jsonData = JSON.stringify(params);
+					data.field.name =jsonData
+					console.log(jsonData)
+					ajax_post("{{.PostUrl}}", data.field, load_page, true, true, true);
+					return false;
+				});
+			}); $("#btn-search").click(function () {
+            var query = $('.x-search-form').serialize();
+            console.log(query)
+            load_page({{urlfor "admin.BannerController.Index"}} + '?' + query);
+        });
+		}
+	</script>
+
+</body>
+{{end}}
+

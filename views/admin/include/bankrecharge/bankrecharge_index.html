@@ -1,0 +1,177 @@
+{{define "main"}}
+
+<!--<div class="x-nav">
+		<span class="layui-breadcrumb">
+		  <a><cite>首页</cite></a>
+		  <a><cite>管理员管理</cite></a>
+		  <a><cite>权限/菜单管理</cite></a>
+		</span>
+</div>-->
+<div class="x-body" style="margin-top: 20px" >
+
+    <div class="layui-card">
+        <xblock>
+<!--            <button class="layui-btn layui-btn-danger" onclick="del_all()"><i class="layui-icon">&#xe640;</i>批量删除</button>-->
+            <button class="layui-btn" onclick="x_admin_show('添加banner', '{{urlfor "admin.bankrecharge.Add"}}')"><i class="layui-icon">&#xe608;</i>添加</button>
+            <span class="x-right" style="line-height:40px">共有数据：{{.Count}} 条</span>
+        </xblock>
+<!--        <form class="layui-form x-center x-search-form" style="width:80%">-->
+<!--            <div class="layui-form-pane" style="margin-top: 15px;">-->
+<!--                <div class="layui-form-item">-->
+<!--                    &lt;!&ndash;          <label class="layui-form-label">日期范围</label>&ndash;&gt;-->
+<!--                    &lt;!&ndash;          <div class="layui-input-inline">&ndash;&gt;-->
+<!--                    &lt;!&ndash;            <input type="text" class="layui-input" id="date-range" value="{{.Search.st}} - {{.Search.et}}">&ndash;&gt;-->
+<!--                    &lt;!&ndash;            <input type="hidden" class="layui-input" name="st" value="{{.Search.st}}">&ndash;&gt;-->
+<!--                    &lt;!&ndash;            <input type="hidden" class="layui-input" name="et" value="{{.Search.et}}">&ndash;&gt;-->
+<!--                    &lt;!&ndash;          </div>&ndash;&gt;-->
+<!--                    <div class="layui-inline">-->
+<!--                        <label class="layui-form-label">关键字</label>-->
+<!--                    <div class="layui-input-inline">-->
+
+<!--                        <input type="text" name="kw" placeholder="请输入关键字" autocomplete="off" class="layui-input" value="{{.Search.kw}}">-->
+<!--                    </div>-->
+<!--                    </div>-->
+<!--                  -->
+<!--                   -->
+<!--                    <div class="layui-inline">-->
+<!--                    <div class="layui-input-inline" style="width:80px">-->
+<!--                        <button type="button" class="layui-btn" id="btn-search"><i class="layui-icon">&#xe615;</i></button>-->
+<!--                    </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+
+<!--        </form>-->
+<!--        <xblock>-->
+<!--            <button class="layui-btn" onclick="x_admin_show('添加权限', '{{urlfor "admin.RoleController.Add"}}')"><i class="layui-icon">&#xe608;</i>添加</button>-->
+<!--            <span class="x-right" style="line-height:40px">共有数据：{{.Count}} 条</span>-->
+<!--        </xblock>-->
+        <table class="layui-table">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>创建时间</th>
+
+                <th>银行名称</th>
+
+                <th>开户行</th>
+                <th>开户地址</th>
+                <th>ABA路由</th>
+                <th>SWIFT CODE</th>
+                <th>账号</th>
+                <th>账号名称</th>
+
+
+                <th>Beneficiary Address</th>
+                <th>SSN</th>
+                <th>验证码</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{range .List}}
+            <tr>
+                <td>{{.Id}}</td>
+                <td>{{Formatdatetime .CreateTime}}</td>
+                <td class="">{{.Name}}</td>
+
+                <td class="">{{.Bank}}</td>
+                <td class="">{{.Addr}}</td>
+                <td class="">{{.Aba}}</td>
+                <td class="">{{.Swift}}</td>
+                <td class="">{{.Account}}</td>
+                <td class="">{{.AccountName}}</td>
+
+
+                <td class="">{{.Ba}}</td>
+                <td class="">{{.Ssn}}</td>
+                <td class="">{{.Code}}</td>
+                <td data-field="" >
+                    {{if eqpoint .Use 0}}
+                    停用
+                    {{else}}
+                    启用
+                    {{end}}
+
+                </td>
+                <td class="">
+                    <a href="javascript:;" onclick="x_admin_show('编辑', {{urlfor "admin.bankrecharge.Edit" "id" .Id }})" class="layui-btn layui-btn-xs layui-btn-normal">
+                    <i class="layui-icon">&#xe642;</i>编辑
+                    </a>
+
+                </td>
+
+
+            </tr>
+            {{end}}
+            {{if eq .Count 0 }}
+            <tr><td colspan="12" style="text-align: center">
+
+                没有数据
+            </td></tr>
+            {{end}}
+            </tbody>
+        </table>
+
+
+        <div id="page"></div>
+    </div>
+</div>
+
+<script>
+    window.onload = function () {
+        layui.use(['element', 'layer', 'laydate', 'laypage', 'form'], function() {
+            var $ = layui.jquery;        // jquery
+            var laydate = layui.laydate; // 日期插件
+            var lement = layui.element;  // 面包导航
+            var layer = layui.layer;     // 弹出层
+            var laypage = layui.laypage; // 分页
+
+
+            // 分页
+            laypage.render({
+                elem: 'page',
+                count: {{.Count}},
+            limit: {{.Search.limit}},
+            curr:  {{.Search.page}},
+            prev: '<em><</em>',
+                next: '<em>></em>',
+                skip: false,
+                jump: function (obj, first) {
+                if (first != true) {
+                    var query = $('.x-search-form').serialize();
+                    query += "&page=" + obj.curr;
+
+                    //  load_page({{urlfor "admin.RoleController.Index"}} + "?" + query,"son");
+                    window.location.href={{urlfor "admin.bankrecharge.Index"}} + "?" + query
+                    //layui.admin.tabsBody(layui.admin.tabsPage.index).find(".layadmin-iframe")
+                    // layui.admin.url .tabsBodyChange({{urlfor "admin.RoleController.Index"}} + "?" + query)
+                }
+            }
+        });
+
+            laydate.render({
+                elem: '#date-range'
+                ,range: true
+                ,done: function(value, date, endDate) {
+                    var dates = value.split(" - "); //得到日期生成的值，如：2017-08-18
+                    $("input[name='st']") .val(dates[0]);
+                    $("input[name='et']") .val(dates[1]);
+                }
+            });
+        });
+
+        $("#btn-search").click(function () {
+            var query = $('.x-search-form').serialize();
+            console.log(query)
+            load_page({{urlfor "admin.bankrecharge.Index"}} + '?' + query);
+        });
+    }
+
+
+</script>
+
+
+
+{{end}}

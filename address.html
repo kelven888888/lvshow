@@ -1,0 +1,189 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>马来西亚地址联动选择器</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .select-transition {
+            transition: all 0.3s ease;
+        }
+
+        .select-transition:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.15);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+
+<body class="flex items-center justify-center p-4 sm:p-8">
+
+    <div class="w-full max-w-4xl glass-effect rounded-2xl shadow-2xl overflow-hidden fade-in">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-blue-600 to-indigo-700 p-6 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-2xl font-bold flex items-center gap-3">
+                        <i class="fa-solid fa-map-location-dot"></i>
+                        马来西亚地址联动选择器
+                    </h1>
+                    <p class="text-blue-100 mt-1 text-sm">Malaysia Address Selector (State - Area - Postcode)</p>
+                </div>
+                <button onclick="app.resetForm()" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg transition text-sm font-medium backdrop-blur-sm">
+                    <i class="fa-solid fa-rotate-right mr-2"></i>重置
+                </button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="p-8">
+            <!-- Form Section -->
+            <form id="addressForm" onsubmit="event.preventDefault(); app.saveAddress();" class="space-y-6">
+                
+                <!-- Personal Info (Optional Context) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold text-gray-700">收件人姓名</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-3 text-gray-400"><i class="fa-regular fa-user"></i></span>
+                            <input type="text" id="receiverName" class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition" placeholder="输入姓名">
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold text-gray-700">联系电话</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-3 text-gray-400"><i class="fa-solid fa-phone"></i></span>
+                            <input type="tel" id="receiverPhone" class="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition" placeholder="+60 12-345 6789">
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="border-gray-200">
+
+                <!-- Address Linkage Section -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- State Selection -->
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold text-gray-700 flex justify-between">
+                            <span>州属 / 联邦直辖区 (State)</span>
+                            <span class="text-xs text-blue-600 font-normal cursor-pointer hover:underline" onclick="app.debugInfo()">查看数据结构</span>
+                        </label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-3 text-gray-400"><i class="fa-solid fa-map"></i></span>
+                            <select id="stateSelect" onchange="app.onStateChange()" class="select-transition w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none cursor-pointer">
+                                <option value="">请选择州属...</option>
+                            </select>
+                            <span class="absolute right-3 top-3 text-gray-400 pointer-events-none"><i class="fa-solid fa-chevron-down"></i></span>
+                        </div>
+                    </div>
+
+                    <!-- Area/City Selection -->
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold text-gray-700">地区 / 城市 (Area/City)</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-3 text-gray-400"><i class="fa-solid building"></i></span>
+                            <select id="areaSelect" onchange="app.onAreaChange()" disabled class="select-transition w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none cursor-not-allowed">
+                                <option value="">请先选择州属</option>
+                            </select>
+                            <span class="absolute right-3 top-3 text-gray-400 pointer-events-none"><i class="fa-solid fa-chevron-down"></i></span>
+                        </div>
+                    </div>
+
+                    <!-- Postcode Selection -->
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold text-gray-700">邮政编码 (Postcode)</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-3 text-gray-400"><i class="fa-solid fa-mail-bulk"></i></span>
+                            <select id="postcodeSelect" disabled class="select-transition w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg bg-gray-50 text-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none cursor-not-allowed">
+                                <option value="">请先选择地区</option>
+                            </select>
+                            <span class="absolute right-3 top-3 text-gray-400 pointer-events-none"><i class="fa-solid fa-chevron-down"></i></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detailed Address Input -->
+                <div class="space-y-2">
+                    <label class="text-sm font-semibold text-gray-700">详细地址 (Address Line 1 & 2)</label>
+                    <textarea id="detailAddress" rows="3" class="w-full p-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition resize-none" placeholder="例如：No. 123, Jalan Bukit Bintang, Taman Melati..."></textarea>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-4 pt-4">
+                    <button type="submit" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition transform hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-save"></i> 保存地址
+                    </button>
+                    <button type="button" onclick="app.loadDemoData()" class="flex-1 bg-white border-2 border-gray-200 hover:border-blue-500 text-gray-700 hover:text-blue-600 font-semibold py-3 px-6 rounded-lg transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-flask"></i> 加载测试数据
+                    </button>
+                </div>
+            </form>
+
+            <!-- Saved Addresses List -->
+            <div class="mt-10">
+                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-blue-600"></i> 已保存的地址
+                </h3>
+                <div id="savedAddressesList" class="space-y-3">
+                    <!-- Dynamic Content Here -->
+                    <div class="text-center py-8 text-gray-400 bg-gray-50 rounded-lg border border-dashed border-gray-300">
+                        <i class="fa-regular fa-folder-open text-3xl mb-2"></i>
+                        <p>暂无保存的地址</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="bg-gray-50 p-4 text-center text-xs text-gray-500 border-t border-gray-200">
+            <p>Data Source: Simplified Malaysia Postcode Database | Designed for Demo Purposes</p>
+        </div>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script src="app.js"></script>
+</body>
+</html>

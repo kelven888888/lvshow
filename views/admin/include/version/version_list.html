@@ -1,0 +1,106 @@
+{{define "main"}}
+<style type="text/css">
+    .fix-table{table-layout: fixed;}
+    .fix-table td {white-space: nowrap; /* 自适应宽度*/overflow:hidden;text-overflow:ellipsis;/*省略号显示*/}
+</style>
+<div class="layui-card">
+    <div class="layui-card-body">
+        <button type="button" class="layui-btn" onclick="x_admin_show('添加版本', '{{urlfor "admin.VersionController.Edit"}}')">添加</button>
+    </div>
+</div>
+<div class="layui-card">
+    <!--        <div class="layui-card-header">理财订单</div>-->
+    <div class="layui-card-body">
+        <table class="layui-table">
+            <colgroup>
+
+            </colgroup>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Version</th>
+                <th>类型</th>
+                <th>强制更新</th>
+                <th>是否启用</th>
+                <td>操作</td>
+            </tr>
+            </thead>
+            <tbody>
+            {{range $value := .list}}
+            <tr>
+                <td>{{$value.Id}}</td>
+                <td>{{$value.Version}}</td>
+                <td>{{$value.Type}}</td>
+                <td>
+                    {{if eq true $value.Force}}
+                    启用
+                    {{else}}
+                    关闭
+                    {{end}}
+                </td>
+                <td>
+                    {{if eq true $value.Enable}}
+                        启用
+                    {{else}}
+                        关闭
+                    {{end}}
+                </td>
+                <td>
+                    <div class="layui-btn-container">
+                        <button  onclick="x_admin_show('修改版本', '{{urlfor "admin.VersionController.Edit"}}?id={{$value.Id}}')" class="layui-btn">修改</button>
+                    </div>
+                </td>
+            </tr>
+            {{end}}
+            </tbody>
+        </table>
+        <div id="page"></div>
+    </div>
+</div>
+<!--</div>-->
+<script>
+    window.onload = function () {
+        layui.use(['element', 'layer', 'laydate', 'laypage', 'form'], function() {
+            var $ = layui.jquery;        // jquery
+            var laypage = layui.laypage; // 分页
+            var layer = layui.layer;
+
+            // 分页
+            laypage.render({
+                elem: 'page',
+                count: {{.req.Count}},
+            limit: {{.req.Limit}},
+            curr:  {{.req.Page}},
+            prev: '<em><</em>',
+                next: '<em>></em>',
+                skip: false,
+                jump: function (obj, first) {
+                if (first != true) {
+                    var query = $('.x-search-form').serialize();
+                    query += "&page=" + obj.curr;
+
+                    //  load_page({{urlfor "admin.RoleController.Index"}} + "?" + query,"son");
+                    window.location.href={{urlfor "admin.VersionController.List"}} + "?" + query
+                    //layui.admin.tabsBody(layui.admin.tabsPage.index).find(".layadmin-iframe")
+                    // layui.admin.url .tabsBodyChange({{urlfor "admin.RoleController.Index"}} + "?" + query)
+                }
+            }
+        })
+
+            $("#btn-search").click(() =>{
+                var query = $('.x-search-form').serialize();
+                console.log(query)
+                load_page({{urlfor "admin.VersionController.List"}} + '?' + query);
+            })
+
+            $("#logBtn").click(() =>{
+                layer.open({
+                    type:1,
+
+                })
+            })
+        })
+    }
+
+</script>
+{{end}}

@@ -1,0 +1,100 @@
+{{define "main"}}
+<div class="x-body" >
+
+    <form class="layui-form">
+        <input type="text" name="id" hidden value="{{.accountMessage.Id}}">
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">分组</label>
+            <div class="layui-input-block">
+                <select name="group" lay-filter="groupType">
+                    {{range $value := .groupOption}}
+                    <option value="{{$value.Value}}" {{if eq true $value.Choose}}selected{{end}}>{{$value.Name}}</option>
+                    {{end}}
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">类型</label>
+            <div class="layui-input-block">
+                <select name="type" lay-filter="chooseType">
+                    {{range $value := .typeOption}}
+                    <option value="{{$value.Value}}" {{if eq true $value.Choose}}selected{{end}}>{{$value.Name}}</option>
+                    {{end}}
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">标题</label>
+            <div class="layui-input-block">
+                <input type="text" name="title" lay-verify="required" placeholder="标题" autocomplete="off" class="layui-input" value="{{.accountMessage.Title}}">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">内容</label>
+            <div class="layui-input-block">
+                <textarea type="text" name="content" lay-verify="required" autocomplete="off" class="layui-textarea" >{{.accountMessage.Content}}</textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户名</label>
+            <div class="layui-input-block">
+                <textarea type="text" name="username" lay-verify="required" autocomplete="off" class="layui-textarea" >{{.accountMessage.Username}}</textarea>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">跳转链接</label>
+            <div class="layui-input-block">
+                <input type="text" name="extends.jump" placeholder="跳转链接" autocomplete="off" class="layui-input" value="{{.accountMessage.Extends.jump}}">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button type="submit" class="layui-btn" lay-submit lay-filter="save">立即提交</button>
+            </div>
+        </div>
+    </form>
+
+</div>
+<script>
+    window.onload = function () {
+        layui.use(['form', 'laydate', 'util', 'upload'], function(){
+            var $ = layui.jquery;        // jquery
+            var form = layui.form;
+            var layer = layui.layer;
+            var laydate = layui.laydate;
+
+            form.on('submit(save)', (data) => {
+                let postData = {
+                    id: parseInt(data.field.id),
+                    type: parseInt(data.field.type),
+                    group: parseInt(data.field.group),
+                    title: data.field.title,
+                    content: data.field.content,
+                    username: data.field.username,
+                }
+                for (const fieldKey in data.field) {
+                    if (fieldKey.includes(".")) {
+                        let fk = fieldKey.split(".")
+                        if (data.field[fieldKey] !== "" && postData[fk[0]] === undefined) {
+                            postData[fk[0]]={}
+                        }
+                        if (data.field[fieldKey] !== ""){
+                            postData[fk[0]][fk[1]] = data.field[fieldKey]
+                        }
+                    }
+                }
+                ajax_post_by_json("{{urlfor "admin.AccountMessageController.Edit"}}", postData, load_page, true, false, true);
+                return false;
+            })
+        })
+    }
+
+</script>
+
+{{end}}

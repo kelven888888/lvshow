@@ -1,0 +1,118 @@
+{{define "main"}}
+<link href="https://unpkg.com/@wangeditor/editor@latest/dist/css/style.css" rel="stylesheet">
+
+<div class="x-body" >
+
+    <form class="layui-form">
+        <input type="text" name="id" hidden value="{{.agreement.Id}}">
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">Key</label>
+            <div class="layui-input-block">
+                <input type="text" name="key" lay-verify="required" placeholder="关键字" autocomplete="off" class="layui-input" value="{{.agreement.Key}}">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">语言</label>
+            <div class="layui-input-inline">
+                <div class="layui-col-md6">
+                    <select name="language">
+                        <option value="">请选择</option>
+                        {{range $k,$v := .language}}
+                        <option value="{{$v.Code}}" {{if eq $.agreement.Language $v.Code }} selected {{end}}>{{$v.Name}}</option>
+                        {{end}}
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">名称</label>
+            <div class="layui-input-block">
+                <input type="text" name="name" lay-verify="required" placeholder="名称" autocomplete="off" class="layui-input" value="{{.agreement.Name}}">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">分组(可选)</label>
+            <div class="layui-input-block">
+                <input type="text" name="group" placeholder="分组" autocomplete="off" class="layui-input" value="{{.agreement.Group}}">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">协议内容</label>
+            <div id="content-editor" class="layui-input-block">
+                <div id="content-toolbar-container"><!-- 工具栏 --></div>
+                <div id="content-editor-container"><!-- 编辑器 --></div>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button type="submit" class="layui-btn" lay-submit lay-filter="save">立即提交</button>
+            </div>
+        </div>
+    </form>
+
+</div>
+<script src="https://unpkg.com/@wangeditor/editor@latest/dist/index.js"></script>
+<script>
+    window.onload = function () {
+        layui.use(['form', 'laydate', 'util', 'upload'], function(){
+            var $ = layui.jquery;        // jquery
+            var form = layui.form;
+            var layer = layui.layer;
+            var laydate = layui.laydate;
+
+            const { createEditor, createToolbar } = window.wangEditor
+
+            const editorConfig = {
+                placeholder: 'Type here...',
+                onChange(editor) {
+                    const html = editor.getHtml()
+                    console.log('editor content', html)
+                    // 也可以同步到 <textarea>
+                },
+                MENU_CONF: {}
+            }
+
+            editorConfig.MENU_CONF['uploadImage'] = {
+                server: '{{urlfor "PublicController.Upload?type=news"}}',
+                fieldName: 'file',
+                customInsert: function(res, insertFn) {
+                    const url = window.location.protocol + "//" +window.location.host + "/" + res.data.url
+                    console.log(url)
+                    insertFn(url, "", url)
+                }
+            }
+
+            const toolbarConfig = {}
+
+            const contentEditor = createEditor({
+                selector: "#content-editor-container",
+                html: '{{.agreement.Content}}',
+                config: editorConfig,
+                mode: 'default'
+            })
+
+            const contentToolbar = createToolbar({
+                editor: contentEditor,
+                selector: '#content-toolbar-container',
+                config: toolbarConfig,
+                mode: 'default', // or 'simple'
+            })
+
+            form.on('submit(save)', (data) => {
+                let field = data.field;
+                field.content = contentEditor.getHtml()
+                ajax_post("{{urlfor "admin.AgreementController.Edit"}}", field, load_page, true, false, true);
+                return false;
+            })
+        })
+    }
+
+</script>
+
+{{end}}

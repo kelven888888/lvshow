@@ -1,0 +1,32 @@
+ALTER TABLE `goods` 
+ADD COLUMN `points` decimal(10, 2) NULL DEFAULT 0 COMMENT '多少积分可兑换' AFTER `reward_type`;
+
+ALTER TABLE `account_funds_log` 
+DROP COLUMN `uid`,
+ADD COLUMN `uid` int(11) NULL AFTER `money_type`;
+
+
+
+
+ALTER TABLE `account_funds_log` 
+ADD INDEX `username`(`username`) USING BTREE,
+ADD INDEX `user_id`(`uid`) USING BTREE,
+ADD INDEX `log_type`(`log_type`) USING BTREE;
+
+
+ALTER TABLE `show_go`.`level_update_log` 
+ADD COLUMN `status` int NULL DEFAULT 0 COMMENT '0未处理1已处理' AFTER `username`;
+
+ALTER TABLE `show_go`.`game_lotty_record` 
+ADD COLUMN `coupon_codes` varchar(255) NULL COMMENT '优惠券' AFTER `coupon_code`;
+ALTER TABLE `show_go`.`game_lotty_record` 
+ADD COLUMN `discount` decimal(10, 2) NULL COMMENT '折扣' AFTER `coupon_code`;
+
+ALTER TABLE `show_go`.`tb_coupon_list` 
+ADD COLUMN `used_time` datetime NULL COMMENT '使用时间' AFTER `remarks`;
+
+ALTER TABLE `show_go`.`goods` 
+MODIFY COLUMN `goods_content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '商品信息' AFTER `goods_desc`;
+
+ALTER TABLE `show_go`.`game_lotty_record` 
+ADD COLUMN `money` decimal(10, 2) NULL ;

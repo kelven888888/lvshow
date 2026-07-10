@@ -1,0 +1,152 @@
+{{define "main"}}
+<link href="https://unpkg.com/@wangeditor/editor@latest/dist/css/style.css" rel="stylesheet">
+
+<div class="x-body" >
+
+    <form class="layui-form">
+        <input type="text" name="id" hidden value="{{.version.Id}}">
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">Version</label>
+            <div class="layui-input-block">
+                <input type="text" name="version" lay-verify="required" placeholder="版本号" autocomplete="off" class="layui-input" value="{{.version.Version}}">
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">类型</label>
+            <div class="layui-input-block">
+                <select name="type" lay-verify="required" lay-search="">
+                    <option value="">直接选择或搜索选择</option>
+                    <option value="android" {{if eq "android" .version.Type}}selected{{end}}>Android</option>
+                    <option value="ios"  {{if eq "ios" .version.Type}}selected{{end}}>IOS</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">下载地址</label>
+            <div class="layui-input-inline">
+                <input type="text" name="url" id="version_url" lay-verify="required" placeholder="下载地址" autocomplete="off" class="layui-input" value="{{.version.Url}}">
+            </div>
+            <div class="layui-input-inline">
+                <div class="site-demo-upbar">
+                    <button type="button" class="layui-btn layui-btn-primary" id="upimg">
+                        <i class="layui-icon">&#xe67c;</i>上传
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">强制更新</label>
+            <div class="layui-input-block">
+                <input type="checkbox" name="force" lay-skin="switch" lay-filter="switchTest"  {{if .version.Force}}checked{{end}}>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">启用</label>
+            <div class="layui-input-block">
+                <input type="checkbox" name="enable" lay-skin="switch" lay-filter="switchTest"  {{if .version.Enable}}checked{{end}}>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">更新内容</label>
+            <div id="content-editor" class="layui-input-block">
+                <div id="content-toolbar-container"><!-- 工具栏 --></div>
+                <div id="content-editor-container"><!-- 编辑器 --></div>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button type="submit" class="layui-btn" lay-submit lay-filter="save">立即提交</button>
+            </div>
+        </div>
+    </form>
+
+</div>
+<script src="https://unpkg.com/@wangeditor/editor@latest/dist/index.js"></script>
+<script>
+    window.onload = function () {
+        layui.use(['form', 'laydate', 'util', 'upload'], function(){
+            var $ = layui.jquery;        // jquery
+            var form = layui.form;
+            var layer = layui.layer;
+            var laydate = layui.laydate;
+
+            layui.upload.render({
+                elem: '#upimg',
+                field: 'file',
+                url: {{urlfor "PublicController.Upload?type=files"}},
+                done: function(res) { //上传成功后的回调
+                    if (res.code == 200) {
+                        $('#version_url').val(res.data.url);
+                    } else {
+                        layer.msg(res.msg, {icon: 3});
+                    }
+                }
+            });
+
+            const { createEditor, createToolbar } = window.wangEditor
+
+            const editorConfig = {
+                placeholder: 'Type here...',
+                onChange(editor) {
+                    const html = editor.getHtml()
+                    console.log('editor content', html)
+                    // 也可以同步到 <textarea>
+                },
+                MENU_CONF: {}
+            }
+
+            editorConfig.MENU_CONF['uploadImage'] = {
+                server: '{{urlfor "PublicController.Upload?type=news"}}',
+                fieldName: 'file',
+                customInsert: function(res, insertFn) {
+                    const url = window.location.protocol + "//" +window.location.host + "/" + res.data.url
+                    console.log(url)
+                    insertFn(url, "", url)
+                }
+            }
+
+            const toolbarConfig = {}
+
+            const contentEditor = createEditor({
+                selector: "#content-editor-container",
+                html: '{{.version.Content}}',
+                config: editorConfig,
+                mode: 'default'
+            })
+
+            const contentToolbar = createToolbar({
+                editor: contentEditor,
+                selector: '#content-toolbar-container',
+                config: toolbarConfig,
+                mode: 'default', // or 'simple'
+            })
+
+            form.on('submit(save)', (data) => {
+                let field = data.field;
+                field.content = contentEditor.getHtml()
+                if (field.enable === 'on') {
+                    field.enable = true
+                }else {
+                    field.enable = false
+                }
+                if (field.force === 'on') {
+                    field.force = true
+                }else {
+                    field.force = false
+                }
+                ajax_post("{{urlfor "admin.VersionController.Edit"}}", data.field, load_page, true, false, true);
+                return false;
+            })
+        })
+    }
+
+</script>
+
+{{end}}

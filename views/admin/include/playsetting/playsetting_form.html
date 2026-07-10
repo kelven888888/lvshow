@@ -1,0 +1,201 @@
+
+{{define "main"}}
+
+	<div class="x-body">
+		<form class="layui-form">
+			{{range .language}}
+			<div class="layui-form-item">
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>{{.Name}}名称</label>
+				<div class="layui-input-block">
+					<input type="text" id="name" name="{{.Code}}" lay-verify="required" autocomplete="off" class="layui-input" value="{{language .Code $.result.Name}}">
+				</div>
+			</div>
+			{{end}}
+			<div class="layui-form-item">
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>奖励配置</label>
+				<div class="layui-input-block">
+					<input type="text" id="reward_arr" name="reward_arr" lay-verify="required" autocomplete="off" class="layui-input" value="{{.result.RewardArr}}">
+				</div>
+			</div>
+	    <div class="layui-form-item">
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>概率配置</label>
+				<div class="layui-input-block">
+					<input type="text" id="rate_arr" name="rate_arr" lay-verify="required" autocomplete="off" class="layui-input" value="{{.result.RateArr}}">
+				</div>
+			<div class="layui-input-block">
+				概率配置百分比1代表1%
+			</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>积分奖励<br>配置</label>
+				<div class="layui-input-block">
+					<input type="text" id="point_arr" name="point_arr" lay-verify="required" autocomplete="off" class="layui-input" value="{{.result.PointArr}}">
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>佣金比例<br>配置</label>
+				<div class="layui-input-block">
+					<input type="text" id="commission_rate" name="commission_rate" lay-verify="required" autocomplete="off" class="layui-input" value="{{.result.CommissionRate}}">
+				</div>
+				<div class="layui-input-block">
+					概率配置百分比1代表1% 0.1 代表0.1%
+				</div>
+			</div>
+
+<!--	<div class="layui-form-item">-->
+<!--	<label for="title" class="layui-form-label"><span class="x-red">*</span>参加获得积分</label>-->
+<!--	<div class="layui-input-block">-->
+<!--		<input type="text" id="join_point_reward" name="join_point_reward" lay-verify="required" autocomplete="off" class="layui-input" value="{{.result.JoinPointReward}}">-->
+<!--	</div>-->
+<!--</div>-->
+			<div class="layui-form-item">
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>消费1RM获得多少经验</label>
+				<div class="layui-input-block">
+					<input type="text" id="money_to_exp" name="money_to_exp" lay-verify="required" autocomplete="off" class="layui-input" value="{{.result.MoneyToExp}}">
+				</div>
+			</div>
+
+<div class="layui-form-item">
+				<label class="layui-form-label">单人模式<br>开关</label>
+				<div class="layui-input-inline">
+				{{if .IsUpdate}}<input type="radio" name="singel_status" value="0" title="关闭"  {{if eqpoint .result.SingelStatus 0 }} checked {{end}}>
+<input type="radio" name="singel_status" value="1" title="启用"  {{if eqpoint .result.SingelStatus 1 }} checked {{end}}>
+{{else}}	<input type = "radio" name = "singel_status" value = "0" title = "关闭"  checked>
+	<input type = "radio" name = "singel_status" value = "1" title = "启用"  checked>
+
+				{{end}}
+				</div>
+				</div><div class="layui-form-item">
+				<label class="layui-form-label">双人模式<br>开关</label>
+				<div class="layui-input-inline">
+				{{if .IsUpdate}}<input type="radio" name="double_status" value="0" title="关闭"  {{if eqpoint .result.DoubleStatus 0 }} checked {{end}}>
+<input type="radio" name="double_status" value="1" title="启用"  {{if eqpoint .result.DoubleStatus 1 }} checked {{end}}>
+{{else}}	<input type = "radio" name = "double_status" value = "0" title = "关闭"  checked>
+	<input type = "radio" name = "double_status" value = "1" title = "启用"  checked>
+
+				{{end}}
+				</div>
+				</div><div class="layui-form-item">
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>参加价格</label>
+				<div class="layui-input-block">
+					<input type="text" id="price" name="price" lay-verify="required" autocomplete="off" class="layui-input" value="{{.result.Price}}">
+				</div>
+			</div>
+
+
+<div class="layui-form-item">
+	<label for="title" class="layui-form-label"><span class="x-red">D连击次数</span></label>
+	<div class="layui-input-block">
+		<input type="text" id="dhit" name="dhit" lay-verify="required" autocomplete="off" class="layui-input" value="{{.result.Dhit}}">
+	</div>
+	<div class="layui-input-block">	D连击次数算一次combo(保底必填)</div>
+</div>
+			<div class="layui-form-item">
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>combo次数</label>
+				<div class="layui-input-block">
+					<input type="text" id="combo" name="combo" lay-verify="required" autocomplete="off" class="layui-input" value="{{.result.Combo}}">
+				</div>
+				<div class="layui-input-block">	累计combo次数(保底必填)</div>
+			</div>
+<div class="layui-form-item">
+				<label class="layui-form-label">类型</label>
+				<div class="layui-input-inline">
+				{{if .IsUpdate}}<input type="radio" name="type" value="1" title="高爆赏"  {{if eqpoint .result.Type 1 }} checked {{end}}>
+<input type="radio" name="type" value="2" title="保底赏"  {{if eqpoint .result.Type 2 }} checked {{end}}>
+<input type="radio" name="type" value="3" title="魔王赏"  {{if eqpoint .result.Type 3 }} checked {{end}}>
+<input type="radio" name="type" value="4" title="PK赏"  {{if eqpoint .result.Type 4 }} checked {{end}}>
+<input type="radio" name="type" value="6" title="盲盒"  {{if eqpoint .result.Type 6 }} checked {{end}}>
+					<input type="radio" name="type" value="5" title="随机赏"  {{if eqpoint .result.Type 5 }} checked {{end}}>
+{{else}}	<input type = "radio" name = "type" value = "1" title = "高爆赏"  checked>
+	<input type = "radio" name = "type" value = "2" title = "保底赏"  checked>
+	<input type = "radio" name = "type" value = "3" title = "魔王赏"  checked>
+	<input type = "radio" name = "type" value = "4" title = "PK赏"  checked>
+	<input type = "radio" name = "type" value = "5" title = "随机赏"  checked>
+					<input type = "radio" name = "type" value = "6" title = "盲盒"  checked>
+
+				{{end}}
+				</div>
+				</div>
+
+			<div class="layui-form-item">
+				<label  class="layui-form-label"><span class="x-red">*</span>缩略图</label>
+				<div class="layui-input-inline">
+					<img id="LAY_upload" width="150"
+						 {{if .IsUpdate}}
+						 src="../../{{.result.Img}}"
+						 {{end}}
+					>
+					<input type="hidden" id="upload_cover" name="img" value="{{.result.Img}}">
+				</div>
+
+				<div class="layui-input-inline">
+					<div class="site-demo-upbar">
+						<button type="button" class="layui-btn layui-btn-primary" id="upimg">
+							<i class="layui-icon">&#xe67c;</i>上传图片
+						</button>
+					</div>
+				</div>
+			</div>
+
+
+
+			<div class="layui-form-item">
+				<input type="hidden" id="id" name="id" value="{{.result.Id}}">
+				<button  class="layui-btn" lay-filter="save" lay-submit="">
+					保存
+				</button>
+			</div>
+		</form>
+	</div>
+		<script>
+		window.onload = function() {
+			layui.use(['form', 'layer', 'upload'], function() {
+				$ = layui.jquery;
+
+				var form = layui.form
+					,layer = layui.layer;
+				//图片上传接口
+				layui.upload.render({
+					elem: '#upimg',
+					field: 'file',
+					url: {{urlfor "PublicController.Upload?type=banner"}},
+				done: function(res) { //上传成功后的回调
+					if (res.code == 200) {
+						$('#LAY_upload').attr('src',"../../"+ res.data.url);
+						$('#upload_cover').val(res.data.url);
+					} else {
+						layer.msg(res.msg, {icon: 3});
+					}
+				}
+			});
+				
+				// 监听提交
+				form.on('submit(save)', function(data) {
+					let params = {};
+
+					$("input[id='name']").each(function(index, value){
+
+						//alert($(this).val())
+						params[value.name] = value.value;
+
+
+					})
+					var jsonData = JSON.stringify(params);
+					data.field.name =jsonData
+					console.log(jsonData)
+					ajax_post("{{.PostUrl}}", data.field, load_page, true, true, true);
+					return false;
+				});
+			}); $("#btn-search").click(function () {
+            var query = $('.x-search-form').serialize();
+            console.log(query)
+            load_page({{urlfor "admin.BannerController.Index"}} + '?' + query);
+        });
+		}
+	</script>
+
+</body>
+{{end}}
+

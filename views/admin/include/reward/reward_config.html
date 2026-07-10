@@ -1,0 +1,141 @@
+{{define "main"}}
+<div class="x-body" >
+  <form class="layui-form" id="profit_reward">
+    <div class="layui-form-item" >
+      <label class="layui-form-label">收益奖励</label>
+      <div class="layui-input-block">
+        <input type="checkbox" id="profit_reward_enable" {{if .config.ProfitReward.Enable}}checked{{end}} lay-skin="switch" title="false|true" >
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">烧伤规则</label>
+      <div class="layui-input-block">
+        <input type="checkbox" id="profit_reward_enable_rule" {{if .config.ProfitReward.EnableRule}}checked{{end}} lay-skin="switch" title="false|true">
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">奖励比例[一级]</label>
+      <div class="layui-input-block">
+        <input type="text" id="profit_reward_layer_one" class="layui-input" value="{{.config.ProfitReward.LayerOne}}">
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">奖励比例[二级]</label>
+      <div class="layui-input-block">
+        <input type="text" id="profit_reward_layer_two" class="layui-input" value="{{.config.ProfitReward.LayerTwo}}">
+      </div>
+    </div>
+  </form>
+  <br/>
+  <form class="layui-form" id="funds_reward">
+    <div class="layui-form-item" >
+      <label class="layui-form-label">季度奖励</label>
+      <div class="layui-input-block">
+        <input type="checkbox" id="funds_reward_enable" {{if .config.FundsReward.Enable}}checked{{end}} lay-skin="switch" title="false|true" >
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">累计天数</label>
+      <div class="layui-input-block">
+        <input type="text" id="funds_reward_days" class="layui-input" value="{{.config.FundsReward.Days}}" >
+      </div>
+    </div>
+
+    <div class="layui-form-item">
+      <label class="layui-form-label">范围配置</label>
+
+      <div class="layui-input-block">
+        <table class="layui-table">
+          <colgroup>
+            <col width="150">
+            <col width="150">
+            <col>
+          </colgroup>
+          <thead>
+          <tr>
+            <th>最小值</th>
+            <th>最大值</th>
+            <th>比例</th>
+            <th>启用</th>
+          </tr>
+          </thead>
+          <tbody>
+            {{range $index, $value := .config.FundsReward.Scope }}
+            <tr>
+              <td>
+                <input type="text" id="scope_{{$index}}_min" class="layui-input" value="{{$value.Min}}" />
+              </td>
+              <td>
+                <input type="text" id="scope_{{$index}}_max" class="layui-input" value="{{$value.Max}}" />
+              </td>
+              <td>
+                <input type="text" id="scope_{{$index}}_rate" class="layui-input" value="{{$value.Rate}}" />
+              </td>
+              <td>
+                <input type="checkbox" id="scope_{{$index}}_enable" checked="{{if eq true $value.Enable}}true{{else}}false{{end}}" lay-skin="switch" title="false|true" value="{{$value.Enable}}">
+              </td>
+            </tr>
+            {{end}}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </form>
+  <div class="layui-form-item">
+    <div class="layui-input-block">
+      <button type="submit" class="layui-btn" lay-submit lay-filter="set_reward_config">立即提交</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+  window.onload = function () {
+    layui.use(['form', 'laydate', 'util'], function(){
+      var $ = layui.jquery;        // jquery
+      var form = layui.form;
+      var layer = layui.layer;
+
+      form.on('submit(set_reward_config)', (data) => {
+        const jsonData = {
+          strategy_reward: {
+            enable: $("#profit_reward_enable").prop("checked"),
+            enable_rule: $("#profit_reward_enable_rule").prop("checked"),
+            layer_one: $("#profit_reward_layer_one").val(),
+            layer_two: $("#profit_reward_layer_two").val(),
+          },
+          funds_reward: {
+            enable: $("#funds_reward_enable").prop("checked"),
+            days: parseInt($("#funds_reward_days").val()),
+            scope: [
+              {min: $("#scope_0_min").val(),max:$("#scope_0_max").val(),rate:$("#scope_0_rate").val(),enable:$("#scope_0_enable").prop("checked")},
+              {min: $("#scope_1_min").val(),max:$("#scope_1_max").val(),rate:$("#scope_1_rate").val(),enable:$("#scope_1_enable").prop("checked")},
+              {min: $("#scope_2_min").val(),max:$("#scope_2_max").val(),rate:$("#scope_2_rate").val(),enable:$("#scope_2_enable").prop("checked")},
+              {min: $("#scope_3_min").val(),max:$("#scope_3_max").val(),rate:$("#scope_3_rate").val(),enable:$("#scope_3_enable").prop("checked")}
+            ]
+          }
+        }
+
+        $.ajax({
+          method: "post",
+          url: '{{urlfor "admin.RewardController.Config"}}',
+          dataType: "json",
+          data: JSON.stringify(jsonData),
+          contentType: "application/json",
+          success: (res) =>{
+            console.log(res)
+            if (res.code !== 200) {
+              layer.msg(res.msg)
+            }else{
+              layer.msg(res.msg)
+            }
+          }
+        })
+        return false
+      })
+
+    })
+  }
+
+</script>
+{{end}}

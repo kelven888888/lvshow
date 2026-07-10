@@ -1,0 +1,279 @@
+{{define "main"}}
+<body class="x-iframe-body">
+
+
+<div class="x-body">
+        <div class="layui-card">
+            <form class="layui-form x-center x-search-form" style="width:80%">
+                <div class="layui-form-pane" style="margin-top: 15px;">
+                    <div class="layui-form-item">
+                        <!--          <label class="layui-form-label">日期范围</label>-->
+                        <!--          <div class="layui-input-inline">-->
+                        <!--            <input type="text" class="layui-input" id="date-range" value="{{.Search.st}} - {{.Search.et}}">-->
+                        <!--            <input type="hidden" class="layui-input" name="st" value="{{.Search.st}}">-->
+                        <!--            <input type="hidden" class="layui-input" name="et" value="{{.Search.et}}">-->
+                        <!--          </div>-->
+                        <div class="layui-inline">
+                            <label class="layui-form-label">关键字</label>
+                            <div class="layui-input-inline">
+
+                                <input type="text" name="kw" placeholder="请输入关键字" autocomplete="off" class="layui-input" value="{{.Search.kw}}">
+                            </div>
+                        </div>
+
+                        <div class="layui-inline"> <label class="layui-form-label">状态</label>
+                            <div class="layui-input-inline">
+                                <select name="status" lay-verify="required" lay-search="">
+                                    <option value="">直接选择或搜索选择</option>
+                                    <option  value=2 {{if eqpoint .Search.status 2}}selected{{end}}>通过</option>
+                                    <option value=3  {{if eqpoint .Search.status 3}}selected{{end}}>拒绝</option>
+                                    <option value=1  {{if eqpoint .Search.status 1}}selected{{end}}>未审核</option>
+
+                                </select>
+                            </div>
+                        </div>
+                        <div class="layui-inline">
+                            <div class="layui-input-inline" style="width:80px">
+                                <button type="button" class="layui-btn" id="btn-search"><i class="layui-icon">&#xe615;</i></button>
+                            </div>
+                            <div class="layui-input-inline" style="width:80px">
+                                <button type="button" class="layui-btn" id="export">数据导出</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+            <xblock>
+
+                <button class="layui-btn " onclick="withdray_pass()"><i class="layui-icon">&#xe605;</i>同意</button>
+                <button class="layui-btn layui-bg-red" onclick="withdray_refuse()"><i class="layui-icon">&#x1006;</i>拒绝</button>
+                <span class="x-right" style="line-height:40px">共有数据：{{.Count}} 条</span>
+            </xblock>
+            <table class="layui-table layui-form">
+                <thead>
+                    <tr>
+                        <th style="width: 30px"><input type="checkbox" lay-skin="primary" lay-filter="all-select"></th>
+                        <th>ID</th>
+                        <th>平台账号</th>
+                        <th>提现信息</th>
+
+                        <th>类型</th>
+                        <th>金额</th>
+                        <th>汇率</th>
+
+
+                        <th>手续费</th>
+
+                        <th>状态</th>
+                        <th>添加时间</th>
+
+                    </tr>
+                </thead>
+                <tbody id="x-img">
+                {{range .List}}
+                    <tr>
+                        <td><input type="checkbox" lay-skin="primary" value="{{.Id}}" class="all-x-select"></td>
+                        <td>{{.Id}}</td>
+                        <td>{{.Username}}</td>
+
+
+
+                        <td>{{.WalletPath}}</td>
+                        <td>
+                            {{if eq .Type  1}}
+                            {{.PathType}}
+                            {{end}}
+
+                            {{if eq .Type  2}}
+                            银行卡
+                            {{end}}
+                        </td>
+                        <td>
+                            {{if eq .Type  1}}
+                            U{{.Amount}}(RM{{Mul .Amount .ExchangeRate}})
+                            {{end}}
+                            {{if eq .Type  2}}
+                            RM{{.Amount}}
+
+                            {{end}}
+                        </td>
+                        <td>{{.ExchangeRate}}</td>
+
+                        <td>
+                            {{if eq .Type  1}}
+                            {{.Fee}}U
+                            {{end}}
+                            {{if eq .Type  2}}
+                            {{.Fee}}RM
+                            {{end}}
+                        </td>
+                        <td data-field="Status" >
+                            {{if eqpoint .Status 0}}
+                            <div class="layui-unselect layui-form-switch layui-checkbox-disbaled layui-disabled" lay-skin="_switch"><em>待审核</em><i></i></div>
+                            {{end}}
+                            {{if eqpoint .Status 1}}
+                            <div class="layui-unselect layui-form-switch layui-form-onswitch layui-checkbox-disbaled layui-disabled" lay-skin="_switch"><em>通过</em><i></i></div>
+                            {{end}}
+                            {{if eqpoint .Status 2}}
+                            <div class="layui-unselect layui-form-switch layui-form-onswitch layui-checkbox-disbaled layui-disabled" lay-skin="_switch"><em>拒绝</em><i></i></div>
+                            {{end}}
+                            {{if eqpoint .Status 3}}
+                            <div class="layui-unselect layui-form-switch layui-form-onswitch layui-checkbox-disbaled layui-disabled" lay-skin="_switch"><em>待上链</em><i></i></div>
+                            {{end}}
+                            {{if eqpoint .Status 4}}
+                            <div class="layui-unselect layui-form-switch layui-form-onswitch layui-checkbox-disbaled layui-disabled" lay-skin="_switch"><em>上链失败</em><i></i></div>
+                            {{end}}
+                            {{if eqpoint .Status 5}}
+                            <div class="layui-unselect layui-form-switch layui-form-onswitch layui-checkbox-disbaled layui-disabled" lay-skin="_switch"><em>钱包上链中</em><i></i></div>
+                            {{end}}
+                        </td>
+                        <td>{{Formatdatetime .CreateTime}}</td>
+
+                    </tr>
+                {{end}}
+                </tbody>
+            </table>
+            <div id="page"></div>
+        </div>
+	</div>
+<!--	<script>-->
+<!--		window.onload = function() {-->
+<!--			layui.use(['layer', 'form'], function() {-->
+<!--				$ = layui.jquery; //jquery-->
+<!--				layer = layui.layer; //弹出层-->
+
+
+<!--				layer.ready(function() { //为了layer.ext.js加载完毕再执行-->
+<!--					layer.photos({-->
+<!--						photos: '#x-img'-->
+<!--						//,shift: 5 //0-6的选择，指定弹出图片动画类型，默认随机-->
+<!--					});-->
+<!--				});-->
+<!--			});-->
+<!--		}-->
+
+<!--		// 批量删除提交-->
+<!--		function del_all() {-->
+<!--			parent.layer.confirm('确认要删除吗？', function(index) {-->
+<!--                var ids = get_list_ids('all-x-select');-->
+<!--				// 发异步删除数据-->
+<!--				ajax_post({{urlfor "admin.BannerController.DeleteBatch"}}, {ids: ids}, false,true, false, true);-->
+<!--			});-->
+<!--		}-->
+
+<!--		// 删除-->
+<!--		function del(obj, id, name) {-->
+<!--            parent.layer.confirm('确认要删除吗？', function(index) {-->
+<!--				$(obj).parents("tr").remove();-->
+
+<!--				//发异步删除数据-->
+<!--				ajax_post({{urlfor "admin.BannerController.Delete"}}, {id: id, name: name}, reload_page);-->
+<!--			});-->
+<!--		}-->
+<!--	</script>-->
+
+<script>
+    window.onload = function () {
+        layui.use(['element', 'layer', 'laydate', 'laypage', 'form'], function() {
+            var $ = layui.jquery;        // jquery
+            var laydate = layui.laydate; // 日期插件
+            var lement = layui.element;  // 面包导航
+            var layer = layui.layer;     // 弹出层
+            var laypage = layui.laypage; // 分页
+            layer.ready(function() { //为了layer.ext.js加载完毕再执行
+                layer.photos({
+                    photos: '#x-img'
+                    //,shift: 5 //0-6的选择，指定弹出图片动画类型，默认随机
+                });
+            });
+
+            // 分页
+            laypage.render({
+                elem: 'page',
+                count: {{.Count}},
+            limit: {{.Search.limit}},
+            curr:  {{.Search.page}},
+            prev: '<em><</em>',
+                next: '<em>></em>',
+                skip: false,
+                jump: function (obj, first) {
+                if (first != true) {
+                    var query = $('.x-search-form').serialize();
+                    query += "&page=" + obj.curr;
+
+                    //  load_page({{urlfor "admin.RoleController.Index"}} + "?" + query,"son");
+                    window.location.href={{urlfor "admin.UsdtWithdrawController.Index"}} + "?" + query
+                    //layui.admin.tabsBody(layui.admin.tabsPage.index).find(".layadmin-iframe")
+                    // layui.admin.url .tabsBodyChange({{urlfor "admin.RoleController.Index"}} + "?" + query)
+                }
+            }
+        });
+
+            laydate.render({
+                elem: '#date-range'
+                ,range: true
+                ,done: function(value, date, endDate) {
+                    var dates = value.split(" - "); //得到日期生成的值，如：2017-08-18
+                    $("input[name='st']") .val(dates[0]);
+                    $("input[name='et']") .val(dates[1]);
+                }
+            });
+        });
+        /*-删除*/
+
+        $("#btn-search").click(function () {
+            var query = $('.x-search-form').serialize();
+            console.log(query)
+            load_page({{urlfor "admin.UsdtWithdrawController.Index"}} + '?' + query);
+        });
+
+        $("#export").click(function () {
+            var query = $('.x-search-form').serialize();
+            window.open({{urlfor "admin.UsdtWithdrawController.Index"}} + '?' + query +"&export=true");
+        });
+    }
+
+
+</script>
+
+<script type="text/javascript">
+    function withdray_pass_udun(obj, id) {
+        var ids = get_list_ids('all-x-select');
+        if (ids.length==0) {
+            layer.alert('请选择')
+            return false;
+        }
+        parent.layer.confirm('确认要执行吗？', function(index) {
+
+            // 发异步删除数据
+            ajax_post({{urlfor "admin.usdtwithdraw.passudun"}},{ids: ids}, false,true, false, true);
+        });
+    }
+    function withdray_pass(obj, id) {
+        var ids = get_list_ids('all-x-select');
+        if (ids.length==0) {
+            layer.alert('请选择')
+            return false;
+        }
+        parent.layer.confirm('确认要执行吗？', function(index) {
+
+            // 发异步删除数据
+            ajax_post({{urlfor "admin.usdtwithdraw.pass"}},{ids: ids}, false,true, false, true);
+        });
+    }
+    function withdray_refuse(obj, id) {
+
+        parent.layer.confirm('确认要执行吗？', function(index) {
+            var ids = get_list_ids('all-x-select');
+            if (ids.length==0) {
+                layer.alert('请选择')
+                return false;
+            }
+            // 发异步删除数据
+            ajax_post({{urlfor "admin.usdtwithdraw.refuse"}}, {ids: ids}, false,true, false, true);
+        });
+    }
+</script>
+
+{{end}}

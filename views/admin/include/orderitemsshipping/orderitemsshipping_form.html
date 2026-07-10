@@ -1,0 +1,77 @@
+
+{{define "main"}}
+
+	<div class="x-body">
+		<form class="layui-form">
+	    <div class="layui-form-item">
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>订单id</label>
+				<div class="layui-input-block">
+					<input type="text" id="order_id" name="order_id" lay-verify="required" autocomplete="off" class="layui-input" value="{{.result.OrderId}}">
+				</div>
+			</div>
+<div class="layui-form-item">
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>产品id</label>
+				<div class="layui-input-block">
+					<input type="text" id="product_id" name="product_id" lay-verify="required" autocomplete="off" class="layui-input" value="{{.result.ProductId}}">
+				</div>
+			</div>
+<div class="layui-form-item">
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>产品名称</label>
+				<div class="layui-input-block">
+					<input type="text" id="product_name" name="product_name" lay-verify="required" autocomplete="off" class="layui-input" value="{{.result.ProductName}}">
+				</div>
+			</div>
+<div class="layui-form-item">
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>产品图片</label>
+				<div class="layui-input-block">
+					<input type="text" id="product_img" name="product_img" lay-verify="required" autocomplete="off" class="layui-input" value="{{.result.ProductImg}}">
+				</div>
+			</div>
+<div class="layui-form-item">
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>数量</label>
+				<div class="layui-input-block">
+					<input type="text" id="qty" name="qty" lay-verify="required" autocomplete="off" class="layui-input" value="{{.result.Qty}}">
+				</div>
+			</div>
+<div class="layui-form-item">
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>商品奖励类型</label>
+				<div class="layui-input-block">
+					<input type="text" id="reward_type" name="reward_type" lay-verify="required" autocomplete="off" class="layui-input" value="{{.result.RewardType}}">
+				</div>
+			</div>
+
+
+
+			<div class="layui-form-item">
+				<input type="hidden" id="id" name="id" value="{{.result.Id}}">
+				<button  class="layui-btn" lay-filter="save" lay-submit="">
+					保存
+				</button>
+			</div>
+		</form>
+	</div>
+		<script>
+		window.onload = function() {
+			layui.use(['form', 'layer', 'upload'], function() {
+				$ = layui.jquery;
+
+				var form = layui.form
+					,layer = layui.layer;
+  
+				
+				// 监听提交
+				form.on('submit(save)', function(data) {
+					ajax_post("{{.PostUrl}}", data.field, load_page, true, true, true);
+					return false;
+				});
+			}); $("#btn-search").click(function () {
+            var query = $('.x-search-form').serialize();
+            console.log(query)
+            load_page({{urlfor "admin.BannerController.Index"}} + '?' + query);
+        });
+		}
+	</script>
+
+</body>
+{{end}}
+

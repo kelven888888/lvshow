@@ -1,0 +1,105 @@
+
+{{define "main"}}
+
+	<div class="x-body">
+		<form class="layui-form">
+	    <div class="layui-form-item">
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>收货人</label>
+				<div class="layui-input-block">
+					<input type="text" id="receiver_name" name="receiver_name" lay-verify="required" autocomplete="off" class="layui-input" value="{{.result.ReceiverName}}">
+				</div>
+			</div>
+<div class="layui-form-item">
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>收货人电话</label>
+				<div class="layui-input-block">
+					<input type="text" id="receiver_phone" name="receiver_phone" lay-verify="required" autocomplete="off" class="layui-input" value="{{.result.ReceiverPhone}}">
+				</div>
+			</div>
+<div class="layui-form-item">
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>地址1</label>
+				<div class="layui-input-block">
+					<input type="text" id="address_line1" name="address_line1" lay-verify="required" autocomplete="off" class="layui-input" value="{{.result.AddressLine1}}">
+				</div>
+			</div>
+<div class="layui-form-item">
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>地址2</label>
+				<div class="layui-input-block">
+					<input type="text" id="address_line2" name="address_line2" autocomplete="off" class="layui-input" value="{{.result.AddressLine2}}">
+				</div>
+			</div>
+<div class="layui-form-item">
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>用户名</label>
+				<div class="layui-input-block">
+					<input type="text" id="username" name="username" lay-verify="required" autocomplete="off" class="layui-input" value="{{.result.Username}}">
+				</div>
+			</div>
+<div class="layui-form-item">
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>城市</label>
+				<div class="layui-input-block">
+					<input type="text" id="city" name="city" lay-verify="required" autocomplete="off" class="layui-input" value="{{.result.City}}">
+				</div>
+			</div>
+<div class="layui-form-item">
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>州/联邦直辖区</label>
+				<div class="layui-input-block">
+					<input type="text" id="state" name="state" lay-verify="required" autocomplete="off" class="layui-input" value="{{.result.State}}">
+				</div>
+			</div>
+<div class="layui-form-item">
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>邮编</label>
+				<div class="layui-input-block">
+					<input type="text" id="postal_code" name="postal_code" lay-verify="required" autocomplete="off" class="layui-input" value="{{.result.PostalCode}}">
+				</div>
+			</div>
+<div class="layui-form-item">
+				<label for="title" class="layui-form-label"><span class="x-red">*</span>国家ISO代码</label>
+				<div class="layui-input-block">
+					<input type="text" id="country_code" name="country_code" lay-verify="required" autocomplete="off" class="layui-input" value="{{.result.CountryCode}}">
+				</div>
+			</div>
+<div class="layui-form-item">
+				<label class="layui-form-label">是否默认</label>
+				<div class="layui-input-inline">
+				{{if .IsUpdate}}<input type="radio" name="is_default" value="0" title="否"  {{if eqpoint .result.IsDefault 0 }} checked {{end}}>
+<input type="radio" name="is_default" value="1" title="是"  {{if eqpoint .result.IsDefault 1 }} checked {{end}}>
+{{else}}	<input type = "radio" name = "is_default" value = "0" title = "否"  checked>
+	<input type = "radio" name = "is_default" value = "1" title = "是"  checked>
+
+				{{end}}
+				</div>
+				</div>
+
+
+			<div class="layui-form-item">
+				<input type="hidden" id="id" name="id" value="{{.result.Id}}">
+				<button  class="layui-btn" lay-filter="save" lay-submit="">
+					保存
+				</button>
+			</div>
+		</form>
+	</div>
+		<script>
+		window.onload = function() {
+			layui.use(['form', 'layer', 'upload'], function() {
+				$ = layui.jquery;
+
+				var form = layui.form
+					,layer = layui.layer;
+  
+				
+				// 监听提交
+				form.on('submit(save)', function(data) {
+					ajax_post("{{.PostUrl}}", data.field, load_page, true, true, true);
+					return false;
+				});
+			}); $("#btn-search").click(function () {
+            var query = $('.x-search-form').serialize();
+            console.log(query)
+            load_page({{urlfor "admin.BannerController.Index"}} + '?' + query);
+        });
+		}
+	</script>
+
+</body>
+{{end}}
+

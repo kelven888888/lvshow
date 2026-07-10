@@ -1,0 +1,85 @@
+
+
+{{define "main"}}
+
+<body>
+<div class="x-body">
+  <form class="layui-form">
+    <div class="layui-form-item">
+      <div class="layui-input-inline">
+<!--        <input type="hidden" id="id" name="id" required="" lay-verify="required" autocomplete="off" value="{{.admininfo.Id}}" disabled="" class="layui-input">-->
+      </div>
+      <label for="account" class="layui-form-label">
+        平台账号
+      </label>
+      <div class="layui-input-inline">
+        <input type="text" value="{{.admininfo.Username }}"  lay-verify="required" autocomplete="off" class="layui-input" disabled>
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">
+        <span class="x-red">*</span>变动资金
+      </label>
+      <div class="layui-input-inline">
+        <input type="text" id="amount" name="amount"    autocomplete="off" class="layui-input">
+      </div>
+
+    </div>
+      <div class="layui-form-item">
+          <label class="layui-form-label">
+              <span class="x-red">*</span>变动积分
+          </label>
+          <div class="layui-input-inline">
+              <input type="text" id="points" name="points"    autocomplete="off" class="layui-input">
+          </div>
+
+      </div>
+
+
+    <div class="layui-form-item">
+      <label for="L_repass" class="layui-form-label"></label>
+      <input type="hidden" name="id" value="{{.admininfo.Id }}" />
+      <button  class="layui-btn" lay-filter="save" lay-submit="">
+        保存
+      </button>
+    </div>
+  </form>
+</div>
+
+<!--<script src="{{.aOut.ViewUrl}}js/md5.min.js"></script>-->
+<script>
+  window.onload = function() {
+    layui.use(['form', 'layer'], function() {
+      $ = layui.jquery;
+
+      var form = layui.form
+              ,layer = layui.layer;
+
+      //自定义验证规则
+      form.verify({
+        pass: [/(.+){6,20}$/, "密码必须6到20位"]
+        ,repass: function(value){
+          if ($("#L_pass").val() != $("#L_repass").val()) {
+            return "两次密码不一致";
+          }
+        }
+      });
+
+      // 监听提交
+      form.on("submit(save)", function(data) {
+        // data.field.pass = md5(data.field.pass);
+
+        data.field.id = parseInt(data.field.id)
+        data.field.amount = parseFloat(data.field.amount)
+          data.field.points = parseFloat(data.field.points)
+        ajax_post({{urlfor "admin.AccountFundsController.fundsedit"}},JSON.stringify(data.field), reload_page, true, true, true);
+        return false;
+      });
+    });
+  }
+</script>
+</body>
+
+
+
+{{end}}

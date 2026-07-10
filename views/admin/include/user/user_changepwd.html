@@ -1,0 +1,184 @@
+
+
+{{define "main"}}
+
+<body>
+<div class="x-body">
+  <form class="layui-form">
+    <div class="layui-form-item">
+      <label for="account" class="layui-form-label">
+        登录名
+      </label>
+      <div class="layui-input-inline">
+        <input type="text" value="{{.admininfo.Username }}" required="" lay-verify="required" autocomplete="off" class="layui-input" disabled>
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label for="L_pass" class="layui-form-label">
+        <span class="x-red">*</span>新密码
+      </label>
+      <div class="layui-input-inline">
+        <input type="password" id="L_pass" name="password" lay-verify="pass" autocomplete="off" class="layui-input">
+      </div>
+      <div class="layui-form-mid layui-word-aux">
+        8到16个字符 包含大小写数字及字母不修改留空
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label for="L_repass" class="layui-form-label">
+        <span class="x-red">*</span>确认密码
+      </label>
+      <div class="layui-input-inline">
+        <input type="password" id="L_repass" name="repass"  lay-verify="repass"
+               autocomplete="off" class="layui-input">
+      </div>
+    </div>
+
+        <div class="layui-form-item">
+          <label class="layui-form-label">禁用</label>
+          <div class="layui-input-block">
+            <input type="checkbox" name="is_active" value="{{.admininfo.IsActive }}"  lay-skin="switch"  {{if eqpoint  .admininfo.IsActive 0 }} checked  {{end}} lay-filter="changeactive" title="ON|OFF"  >
+          </div>
+        </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">是否测试</label>
+      <div class="layui-input-block">
+        <input type="checkbox" name="is_test" value="{{.admininfo.IsTest }}"  lay-skin="switch"  {{if eq  .admininfo.IsTest 2 }} checked  {{end}} lay-filter="changeistest" title="ON|OFF"  >
+      </div>
+    </div>
+
+    <div class="layui-form-item">
+      <label class="layui-form-label">会员等级</label>
+      <div class="layui-input-inline">
+        {{if .IsUpdate}}
+        {{range .memberlevel}}
+        <input type="radio" name="level" value="{{.Level}}" title='{{language "zh-hant" .Title}}'  {{if eqpoint $.admininfo.Level .Level }} checked {{end}} >
+        {{end}}
+
+        {{else}}
+        {{range .memberlevel}}
+        <input type="radio" name="level" value="{{.Level}}" title='{{language "zh-hant" .Title}}'  {{if eqpoint 0 .Level }} checked {{end}} >
+        {{end}}
+
+        {{end}}
+      </div>
+    </div>
+
+    <div class="layui-form-item">
+      <label for="L_repass" class="layui-form-label"></label>
+      <input type="hidden" name="id" id="user_id" value="{{.admininfo.Id }}" />
+      <button  class="layui-btn" lay-filter="save" lay-submit="">
+        保存
+      </button>
+    </div>
+  </form>
+</div>
+
+<!--<script src="{{.aOut.ViewUrl}}js/md5.min.js"></script>-->
+<script>
+  function changestatus(){
+    alert(this.value)
+
+  }
+  window.onload = function() {
+    layui.use(['form', 'layer'], function() {
+      $ = layui.jquery;
+
+      var form = layui.form
+              ,layer = layui.layer;
+
+      //自定义验证规则
+      form.verify({
+        pass:function(value, item){
+          if(value!="") {
+            //[/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,16}$/, "密码必须8到16位,包含数字字母大小写"]
+            if(!/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,16}$/.test(value)){
+              return "密码必须8到16位,包含数字字母大小写";
+
+            }
+          }
+          }
+        ,repass: function(value){
+          if ($("#L_pass").val() != $("#L_repass").val()) {
+            return "两次密码不一致";
+          }
+        }
+      });
+      // 监听switch开关状态变化
+      // form.on('switch(changeactive)', function(data){
+      //   var checked = data.elem.checked; // 获取开关状态：true 或 false
+      //   console.log(checked)
+      //
+      //
+      //   isactive=checked ? 0 : 1;
+      //  id= parseInt($("#user_id").val());
+      //   console.log(id)
+      //   json={
+      //     'id':id,
+      //     'is_active':isactive,
+      //     'is_test':-1,
+      //     'password':"",
+      //   }
+      //   console.log(JSON.stringify(json))
+      //   ajax_post({{urlfor "admin.UserController.changepwd"}},JSON.stringify(json), reload_page, true, true, true);
+      //   // 在这里可以添加其他逻辑处理，例如根据开关状态执行不同的操作
+      // });
+      // form.on('switch(changeistest)', function(data){
+      //   var checked = data.elem.checked; // 获取开关状态：true 或 false
+      //   console.log(checked)
+      //
+      //
+      //   isactive=checked ? 2: 1;
+      //   id= parseInt($("#user_id").val());
+      //   console.log(id)
+      //   json={
+      //     'id':id,
+      //     'is_test': isactive,
+      //     'is_active':-1,
+      //     'password':"",
+      //   }
+      //   console.log(JSON.stringify(json))
+      //   ajax_post({{urlfor "admin.UserController.changepwd"}},JSON.stringify(json), reload_page, true, true, true);
+      //   // 在这里可以添加其他逻辑处理，例如根据开关状态执行不同的操作
+      // });
+
+      // 监听提交
+      form.on("submit(save)", function(data) {
+        // const Regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,16}$/;
+        // if (!!text) {
+        //   return false;
+        // } else {
+        //   return true
+        // }
+        // data.field.pass = md5(data.field.pass);
+        delete data.field.repass;
+        // delete data.field.is_active;
+        // delete data.field.is_test;
+        data.field.id = parseInt(data.field.id)
+        data.field.level = parseInt(data.field.level)
+
+        if(data.field.is_active==1){
+          is_active=0
+        }else{
+          is_active=1
+        }
+
+        if(data.field.is_test==1){
+          is_test=2
+        }else{
+          is_test=1
+        }
+        data.field.is_active = is_active
+        data.field.is_test = is_test
+        console.log(JSON.stringify(data.field))
+        ajax_post({{urlfor "admin.UserController.changepwd"}},JSON.stringify(data.field), reload_page, true, true, true);
+        return false;
+      });
+    });
+  }
+</script>
+</body>
+
+
+
+{{end}}

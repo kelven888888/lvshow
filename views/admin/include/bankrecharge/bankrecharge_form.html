@@ -1,0 +1,124 @@
+{{define "main"}}
+	<div class="x-body">
+		<form class="layui-form">
+			<div class="layui-form-item">
+				<label  class="layui-form-label"><span class="x-red">*</span>银行名称</label>
+				<div class="layui-input-block">
+					<input type="text" id="name" name="name" lay-verify="required" autocomplete="off" class="layui-input" value="{{.result.Name}}">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label  class="layui-form-label"><span class="x-red">*</span>开户行</label>
+				<div class="layui-input-block">
+					<input type="text" id="bank" name="bank" lay-verify="required" autocomplete="off" class="layui-input" value="{{.result.Bank}}">
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label  class="layui-form-label"><span class="x-red">*</span>开户地址</label>
+				<div class="layui-input-block">
+					<input type="text" id="addr" name="addr" lay-verify="required" autocomplete="off" class="layui-input" value="{{.result.Addr}}">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label  class="layui-form-label"><span class="x-red">*</span>ABA路由</label>
+				<div class="layui-input-block">
+					<input type="text" id="aba" name="aba" lay-verify="required" autocomplete="off" class="layui-input" value="{{.result.Aba}}">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label  class="layui-form-label"><span class="x-red">*</span>SSN</label>
+				<div class="layui-input-block">
+					<input type="text" id="ssn" name="ssn" lay-verify="required" autocomplete="off" class="layui-input" value="{{.result.Ssn}}">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label  class="layui-form-label"><span class="x-red">*</span>SWIFT编码 </label>
+				<div class="layui-input-block">
+					<input type="text" id="swift" name="swift" lay-verify="required" autocomplete="off" class="layui-input" value="{{.result.Swift}}">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label"><span class="x-red">*</span>账号名称</label>
+				<div class="layui-input-block">
+					<input type="text" id="accountname" name="accountname" lay-verify="required" autocomplete="off" class="layui-input" value="{{.result.AccountName}}">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label  class="layui-form-label"><span class="x-red">*</span>账号 </label>
+				<div class="layui-input-block">
+					<input type="text" id="account" name="account" lay-verify="required" autocomplete="off" class="layui-input" value="{{.result.Account}}">
+				</div>
+			</div>
+			<label class="layui-form-label"><span class="x-red">*</span>Beneficiary 地址 </label>
+			<div class="layui-input-block">
+				<input type="text" id="ba" name="ba" lay-verify="required" autocomplete="off" class="layui-input" value="{{.result.Ba}}">
+			</div>
+			<div class="layui-form-item">
+				<label  class="layui-form-label"><span class="x-red">*</span>验证码 </label>
+				<div class="layui-input-block">
+					<input type="text" id="code" name="code" lay-verify="required" autocomplete="off" class="layui-input" value="{{.result.Code}}">
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<label class="layui-form-label">启用状态</label>
+				<div class="layui-input-inline">
+					{{if .IsUpdate}}
+					<input type="radio" name="use" value="0" title="停用"  {{if eqpoint .result.Use 0 }} checked {{end}} >
+					<input type="radio" name="use" value="1" title="启用"  {{if eqpoint .result.Use 1 }}  checked {{end}} >
+
+					{{else}}
+					<input type="radio" name="use" value="0" title="停用"  >
+					<input type="radio" name="use" value="1" title="启用"  checked >
+					{{end}}
+				</div>
+			</div>
+
+
+			<div class="layui-form-item">
+				<input type="hidden" id="id" name="id" value="{{.result.Id}}">
+				<button  class="layui-btn" lay-filter="save" lay-submit="">
+					保存
+				</button>
+			</div>
+		</form>
+	</div>
+	<script>
+		window.onload = function() {
+			layui.use(['form', 'layer', 'upload'], function() {
+				$ = layui.jquery;
+
+				var form = layui.form
+					,layer = layui.layer;
+  
+				//图片上传接口
+				layui.upload.render({
+                    elem: '#upimg',
+                    field: 'file',
+					url: {{urlfor "PublicController.Upload"}},
+					done: function(res) { //上传成功后的回调
+						if (res.code == 200) {
+							$('#LAY_upload').attr('src',"../../"+ res.data.url);
+							$('#upload_cover').val(res.data.url);
+						} else {
+							layer.msg(res.msg, {icon: 3});
+						}
+					}
+				});
+
+				// 监听提交
+				form.on('submit(save)', function(data) {
+
+
+					data.field.id = parseInt(data.field.id)
+					data.field.use = parseFloat(data.field.use)
+					// alert(JSON.stringify(data.field.use))
+					ajax_post("{{.PostUrl}}",JSON.stringify(data.field), load_page, true, true, true);
+					return false;
+				});
+			});
+		}
+	</script>
+</body>
+{{end}}

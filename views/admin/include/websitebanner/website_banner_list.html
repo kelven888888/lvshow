@@ -1,0 +1,114 @@
+{{define "main"}}
+<style type="text/css">
+  .fix-table{table-layout: fixed;}
+  .fix-table td {white-space: nowrap; /* 自适应宽度*/overflow:hidden;text-overflow:ellipsis;/*省略号显示*/}
+</style>
+
+<div class="layui-card">
+  <div class="layui-card-body">
+    <button type="button" class="layui-btn" onclick="x_admin_show('添加banner', '{{urlfor "admin.WebsiteBannerController.Edit"}}')">添加</button>
+  </div>
+</div>
+<div class="layui-card">
+  <!--        <div class="layui-card-header">理财订单</div>-->
+  <div class="layui-card-body">
+    <table class="layui-table">
+      <colgroup>
+
+      </colgroup>
+      <thead>
+      <tr>
+        <th>ID</th>
+        <th>创建时间</th>
+        <th>类型</th>
+        <th>标题</th>
+        <th>内容</th>
+        <th>图片</th>
+        <th>排序</th>
+        <th>状态</th>
+        <th>操作</th>
+      </tr>
+      </thead>
+      <tbody>
+      {{range $value := .list}}
+      <tr >
+        <td>{{$value.Id}}</td>
+        <td>{{Formatdatetime $value.CreateTime}}</td>
+        <td>
+          {{if eq 1 $value.Type}}pc{{end}}
+          {{if eq 2 $value.Type}}h5{{end}}
+        </td>
+        <td>{{$value.Title}}</td>
+        <td>{{$value.Content}}</td>
+        <td>
+          <img  width="150" src="../../{{$value.Image}}"/>
+        </td>
+        <td>{{$value.Sort}}</td>
+        <td>{{if eq 1 $value.Status}}启用{{else}}禁用{{end}}</td>
+        <td>
+          <button type="button" class="layui-btn layui-btn-primary" data="{{$value.Id}}" lay-on="edit">修改</button>
+          <button data="{{$value.Id}}" lay-on="delete" class="layui-btn layui-btn-danger">删除</button>
+        </td>
+      </tr>
+      {{end}}
+      </tbody>
+    </table>
+    <div id="page"></div>
+  </div>
+</div>
+<!--</div>-->
+<script>
+  window.onload = function () {
+    layui.use(['element', 'layer', 'laydate', 'laypage', 'form', 'util'], function() {
+      var $ = layui.jquery;        // jquery
+      var laypage = layui.laypage; // 分页
+      var layer = layui.layer;
+      var form = layui.form;
+      var util = layui.util
+      // 分页
+      laypage.render({
+        elem: 'page',
+        count: {{.req.Count}},
+      limit: {{.req.Limit}},
+      curr:  {{.req.Page}},
+      prev: '<em><</em>',
+              next: '<em>></em>',
+              skip: false,
+              jump: function (obj, first) {
+        if (first != true) {
+          var query = $('.x-search-form').serialize();
+          query += "&page=" + obj.curr;
+
+          //  load_page({{urlfor "admin.RoleController.Index"}} + "?" + query,"son");
+          window.location.href={{urlfor "admin.WebsiteBannerController.List"}} + "?" + query
+          //layui.admin.tabsBody(layui.admin.tabsPage.index).find(".layadmin-iframe")
+          // layui.admin.url .tabsBodyChange({{urlfor "admin.RoleController.Index"}} + "?" + query)
+        }
+      }
+    })
+
+      util.event('lay-on', {
+        edit: function(obj) {
+          let id=$(obj).attr("data")
+          x_admin_show('修改banner', '{{urlfor "admin.WebsiteBannerController.Edit"}}?id='+id)
+        },
+        delete: function(obj) {
+          let id = $(obj).attr("data")
+          layer.confirm('确认要删除吗？', function(index) {
+            // 发异步删除数据
+            ajax_post_by_fn({{urlfor "admin.WebsiteBannerController.Delete"}}, {id: id}, false, true, false, true, function (res) {
+              console.log(res)
+              if (res.code == 200){
+                $(obj).parents("tr").remove();
+              }
+            });
+          });
+        }
+      })
+
+
+    })
+  }
+
+</script>
+{{end}}

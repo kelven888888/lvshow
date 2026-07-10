@@ -1,0 +1,107 @@
+{{define "main"}}
+
+<div class="x-body" >
+
+  <form class="layui-form">
+    <input type="text" name="id" hidden value="{{.banner.Id}}">
+    <div class="layui-form-item">
+      <label class="layui-form-label">分类</label>
+      <div class="layui-input-block">
+        <select name="type" lay-verify="required" lay-search="">
+          <option value="">直接选择或搜索选择</option>
+          <option value="1" {{if eq 1 .banner.Type}}selected{{end}}>pc</option>
+          <option value="2"  {{if eq 2 .banner.Type}}selected{{end}}>h5</option>
+        </select>
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">标题</label>
+      <div class="layui-input-block">
+        <input type="text" name="title" lay-verify="required" placeholder="标题" autocomplete="off" class="layui-input" value="{{.banner.Title}}"/>
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">内容</label>
+      <div class="layui-input-block">
+        <input type="text" name="content" lay-verify="required" placeholder="内容" autocomplete="off" class="layui-input" value="{{.banner.Content}}"/>
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">图片</label>
+      <div class="layui-input-block">
+        <img id="LAY_upload" width="150"
+             {{if .banner.Image}}
+             src="../../{{.banner.Image}}"
+             {{end}}
+        >
+        <input type="hidden" id="upload_cover" name="image" {{if .banner.Image}} value="{{.banner.Image}}" {{end}}>
+
+        <div class="layui-input-inline">
+          <div class="site-demo-upbar">
+            <button type="button" class="layui-btn layui-btn-primary" id="upimg">
+              <i class="layui-icon">&#xe67c;</i>上传图片
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">排序</label>
+      <div class="layui-input-block">
+        <input type="text" name="sort" lay-verify="required" placeholder="内容" autocomplete="off" class="layui-input" value="{{.banner.Sort}}"/>
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">状态</label>
+      <div class="layui-input-block">
+        <select name="status" lay-verify="required" lay-search="">
+          <option value="">直接选择或搜索选择</option>
+          <option value="1" {{if eq 1 .banner.Status}}selected{{end}}>启用</option>
+          <option value="0"  {{if eq 2 .banner.Status}}selected{{end}}>禁用</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="layui-form-item">
+      <div class="layui-input-block">
+        <button type="submit" class="layui-btn" lay-submit lay-filter="save">立即提交</button>
+      </div>
+    </div>
+  </form>
+
+</div>
+<script>
+  window.onload = function () {
+    layui.use(['form', 'laydate', 'util', 'upload'], function(){
+      var $ = layui.jquery;        // jquery
+      var form = layui.form;
+      var layer = layui.layer;
+      var laydate = layui.laydate;
+
+
+      //图片上传接口
+      layui.upload.render({
+        elem: '#upimg',
+        field: 'file',
+        url: {{urlfor "PublicController.Upload?type=banner"}},
+      done: function(res) { //上传成功后的回调
+        if (res.code == 200) {
+          $('#LAY_upload').attr('src',"../../"+ res.data.url);
+          $('#upload_cover').val(res.data.url);
+        } else {
+          layer.msg(res.msg, {icon: 3});
+        }
+      }
+    });
+
+      form.on('submit(save)', (data) => {
+        let field = data.field;
+        ajax_post("{{urlfor "admin.WebsiteBannerController.Edit"}}", field, load_page, true, false, true);
+        return false
+      })
+    })
+  }
+
+</script>
+
+{{end}}
