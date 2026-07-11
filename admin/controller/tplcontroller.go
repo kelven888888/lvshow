@@ -67,7 +67,7 @@ func (this *TplController) Edit(ctx *gin.Context) {
 
 		// 查询权限列表
 		var language []model.Language
-		global.SHOP_DB.Model(model.Language{}).Find(&language)
+		global.SHOP_DB.Model(model.Language{}).Where("status=1").Find(&language)
 
 		tpl := "tpl_formnq.html"
 		if global.SHOP_CONFIG.System.Version != "NQ" {
@@ -125,7 +125,7 @@ func (this *TplController) Add(ctx *gin.Context) {
 			tpl = "tpl_form.html"
 		}
 		var language []model.Language
-		global.SHOP_DB.Model(model.Language{}).Find(&language)
+		global.SHOP_DB.Model(model.Language{}).Where("status=1").Find(&language)
 		ctx.HTML(http.StatusOK, tpl, gin.H{
 			"status":   "200",
 			"result":   models,

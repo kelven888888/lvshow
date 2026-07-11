@@ -1,0 +1,205 @@
+
+{{define "main"}}
+
+<body class="x-iframe-body">
+
+
+<div class="x-body">
+        <div class="layui-card">
+         <form class="layui-form x-center x-search-form" style="width:80%">
+                        <div class="layui-form-pane" style="margin-top: 15px;">
+                            <div class="layui-form-item">
+                                   <div class="layui-inline"> <label class="layui-form-label">数字类型参数</label>
+                            <div class="layui-input-inline">
+                                <select name='numeric'  lay-verify="required" lay-search="">
+                                    <option value="">直接选择或搜索选择</option><option  value=2 {{if eqpoint .Search.numeric 2}}selected{{end}}>是</option>
+<option  value=3 {{if eqpoint .Search.numeric 3}}selected{{end}}>否</option>
+
+                                </select>
+                            </div>
+                        </div>
+ <div class="layui-inline"> <label class="layui-form-label">sku通用属性</label>
+                            <div class="layui-input-inline">
+                                <select name='generic'  lay-verify="required" lay-search="">
+                                    <option value="">直接选择或搜索选择</option><option  value=2 {{if eqpoint .Search.generic 2}}selected{{end}}>是</option>
+<option  value=3 {{if eqpoint .Search.generic 3}}selected{{end}}>否</option>
+
+                                </select>
+                            </div>
+                        </div>
+ <div class="layui-inline"> <label class="layui-form-label">用于搜索过滤</label>
+                            <div class="layui-input-inline">
+                                <select name='searching'  lay-verify="required" lay-search="">
+                                    <option value="">直接选择或搜索选择</option><option  value=2 {{if eqpoint .Search.searching 2}}selected{{end}}>是</option>
+<option  value=3 {{if eqpoint .Search.searching 3}}selected{{end}}>否</option>
+
+                                </select>
+                            </div>
+                        </div>
+
+                                <div class="layui-inline">
+                                    <label class="layui-form-label">关键字</label>
+                                    <div class="layui-input-inline">
+
+                                       <input type="text" name="kw" placeholder="请输入关键字" autocomplete="off" class="layui-input" value="{{.Search.kw}}">
+                                    </div>
+                                </div>
+                                <div class="layui-inline"> <label class="layui-form-label">范围</label>
+                                    <div class="layui-input-inline">
+                                        <select name="search_field" lay-verify="required" lay-search="">
+                                            <option value="">直接选择</option>
+
+                                              <option  value="group_id" {{if eq .Search.search_field "group_id"}}selected{{end}}>属性组id</option>
+   <option  value="name" {{if eq .Search.search_field "name"}}selected{{end}}>名称</option>
+   <option  value="numeric" {{if eq .Search.search_field "numeric"}}selected{{end}}>数字类型参数</option>
+   <option  value="unit" {{if eq .Search.search_field "unit"}}selected{{end}}>单位</option>
+   <option  value="generic" {{if eq .Search.search_field "generic"}}selected{{end}}>sku通用属性</option>
+   <option  value="searching" {{if eq .Search.search_field "searching"}}selected{{end}}>用于搜索过滤</option>
+   <option  value="segments" {{if eq .Search.search_field "segments"}}selected{{end}}>数值类型参数</option>
+
+
+                                        </select>
+                                    </div>
+                                </div>
+
+
+
+                                <div class="layui-inline">
+                                    <div class="layui-input-inline" style="width:80px">
+                                        <button type="button" class="layui-btn" id="btn-search"><i class="layui-icon">&#xe615;</i></button>
+                                    </div>
+                                </div>
+                                  <div class="layui-inline">
+                                                            <div class="layui-input-inline" style="width:80px">
+                                                                <button type="reset" class="layui-btn layui-btn-primary" id="reset">重置</button>
+                                                            </div>
+                                                        </div>
+                            </div>
+                        </div>
+
+                    </form>
+            <xblock>
+              <xblock>
+                <button class="layui-btn layui-btn-danger" onclick="del_all()"><i class="layui-icon">&#xe640;</i>批量删除</button>
+                <button class="layui-btn" onclick="x_admin_show('添加banner', '{{urlfor "admin.GoodsSpecParamController.Add"}}')"><i class="layui-icon">&#xe608;</i>添加</button>
+                <span class="x-right" style="line-height:40px">共有数据：{{.Count}} 条</span>
+            </xblock>
+            </xblock>
+            <table class="layui-table layui-form">
+                <thead>
+                    <tr>
+
+                       <th style="width: 30px"><input type="checkbox" lay-skin="primary" lay-filter="all-select"></th>
+                 <th>ID</th> 
+ <th>属性组id</th>
+<th>名称</th>
+<th>数字类型参数</th>
+<th>单位</th>
+<th>sku通用属性</th>
+<th>用于搜索过滤</th>
+<th>数值类型参数</th>
+
+                        <th>创建时间</th>
+                       <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="x-img">
+              {{range .List}}
+                    <tr>
+                        <td><input type="checkbox" lay-skin="primary" value="{{.Id}}" class="all-x-select"></td>
+          <td>{{ .Id}}</td>         
+    <td>{{.GroupId}}</td>
+<td>{{.Name}}</td>
+<td>{{if eqpoint .Numeric 1}}是{{end}}{{if eqpoint .Numeric 2}}否{{end}}</td>
+<td>{{.Unit}}</td>
+<td>{{if eqpoint .Generic 1}}是{{end}}{{if eqpoint .Generic 2}}否{{end}}</td>
+<td>{{if eqpoint .Searching 1}}是{{end}}{{if eqpoint .Searching 2}}否{{end}}</td>
+<td>{{.Segments}}</td>
+  <td> {{.CreatedAt}}</td> <td class="td-manage">
+                            <a href="javascript:;" onclick="x_admin_show('编辑', {{urlfor "admin.GoodsSpecParamController.Edit" "id" .Id}})" class="layui-btn layui-btn-xs layui-btn-normal">
+                            <i class="layui-icon">&#xe642;</i>编辑
+                            </a>
+                            <a class="layui-btn layui-btn-xs layui-btn-danger" href="javascript:;" onclick="del(this,'{{.Id}}')">
+                                <i class="layui-icon">&#xe640;</i>删除
+                            </a>
+                        </td> </tr>
+                {{end}}
+
+                </tbody>
+            </table>
+            <div id="page"></div>
+        </div>
+	</div>
+	<script>
+		window.onload = function() {
+			layui.use(['layer', 'form' ,'laypage', 'form'], function() {
+				$ = layui.jquery; //jquery
+				layer = layui.layer; //弹出层
+                var laypage = layui.laypage; // 分页
+                form=layui.form
+                // 分页
+                laypage.render({
+                    elem: 'page',
+                    count: {{.Count}},
+                limit: {{.Search.limit}},
+                curr:  {{.Search.page}},
+                prev: '<em><</em>',
+                    next: '<em>></em>',
+                    skip: false,
+                    jump: function (obj, first) {
+                    if (first != true) {
+                        var query = $('.x-search-form').serialize();
+                        query += "&page=" + obj.curr;
+
+                        //  load_page({{urlfor "admin.RoleController.Index"}} + "?" + query,"son");
+                        window.location.href={{urlfor "admin.GoodsSpecParamController.Index"}} + "?" + query
+                        //layui.admin.tabsBody(layui.admin.tabsPage.index).find(".layadmin-iframe")
+                        // layui.admin.url .tabsBodyChange({{urlfor "admin.RoleController.Index"}} + "?" + query)
+                    }
+                }
+            });
+
+				layer.ready(function() { //为了layer.ext.js加载完毕再执行
+					layer.photos({
+						photos: '#x-img'
+						//,shift: 5 //0-6的选择，指定弹出图片动画类型，默认随机
+					});
+				});
+			});
+            $('#resetBtn').on('click', function(){
+                // 使用form模块的resetField方法来重置表单
+                form.resetField('myForm');
+            });
+		}
+
+		// 批量删除提交
+		function del_all() {
+			parent.layer.confirm('确认要删除吗？', function(index) {
+                var ids = get_list_ids('all-x-select');
+				// 发异步删除数据
+				ajax_post({{urlfor "admin.GoodsSpecParamController.DeleteBatch"}}, {ids: ids}, false,true, false, true);
+			});
+		}
+
+		// 删除
+		function del(obj, id, name) {
+            parent.layer.confirm('确认要删除吗？', function(index) {
+				$(obj).parents("tr").remove();
+
+				//发异步删除数据
+				ajax_post({{urlfor "admin.GoodsSpecParamController.Delete"}}, {id: id, name: name}, reload_page);
+			});
+		}
+        $("#btn-search").click(function () {
+            var query = $('.x-search-form').serialize();
+            console.log(query)
+            load_page({{urlfor "admin.GoodsSpecParamController.Index"}} + '?' + query);
+        });
+        $("#reset").click(function () {
+            load_page({{urlfor "admin.GoodsSpecParamController.Index"}} + '?' );
+        });
+
+    </script>
+</body>
+{{end}}
+

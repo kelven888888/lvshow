@@ -83,7 +83,7 @@ func SendCode() {
 func Initwebtpl() {
 	var models []model.Tplm
 	var modelslan []model.Language
-	global.SHOP_DB.Model(model.Language{}).Find(&modelslan)
+	global.SHOP_DB.Model(model.Language{}).Where("status=1").Find(&modelslan)
 	query := global.SHOP_DB.Model(model.Tplm{})
 	fmt.Println("init language")
 	err := query.Order(" id desc").Find(&models).Error
@@ -131,7 +131,7 @@ func Initwebtpl() {
 func Initbanner() {
 	var models []model.WebsiteBanner
 	var modelslan []model.Language
-	global.SHOP_DB.Model(model.Language{}).Find(&modelslan)
+	global.SHOP_DB.Model(model.Language{}).Where("status=1").Find(&modelslan)
 	query := global.SHOP_DB.Model(model.WebsiteBanner{})
 	fmt.Println("init language")
 	err := query.Order(" id desc").Find(&models).Error
@@ -183,7 +183,7 @@ func Initbanner() {
 func Initstockpre() {
 	var models []model.StockPredictionDayList
 	var modelslan []model.Language
-	global.SHOP_DB.Model(model.Language{}).Find(&modelslan)
+	global.SHOP_DB.Model(model.Language{}).Where("status=1").Find(&modelslan)
 	query := global.SHOP_DB.Model(model.StockPredictionDayList{})
 	fmt.Println("init language")
 	err := query.Order(" id desc").Find(&models).Error

@@ -68,7 +68,7 @@ func (this *CBanner) Edit(ctx *gin.Context) {
 			this.ErrorHtml(ctx, err.Error())
 		}
 		var language []model.Language
-		global.SHOP_DB.Model(model.Language{}).Find(&language)
+		global.SHOP_DB.Model(model.Language{}).Where("status=1").Find(&language)
 		// 查询权限列表
 		ctx.HTML(http.StatusOK, "banner_form.html", gin.H{
 			"status":   "200",
@@ -119,7 +119,7 @@ func (this *CBanner) Add(ctx *gin.Context) {
 		// 查询权限列表
 		var models model.Banner
 		var language []model.Language
-		global.SHOP_DB.Model(model.Language{}).Find(&language)
+		global.SHOP_DB.Model(model.Language{}).Where("status=1").Find(&language)
 		ctx.HTML(http.StatusOK, "banner_form.html", gin.H{
 			"status":   "200",
 			"result":   models,

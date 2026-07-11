@@ -39,12 +39,12 @@ func (this *CShippingAddresses) Index(ctx *gin.Context) {
 	result, count := this.Services.GetAll(req)
 
 	Search := map[string]interface{}{
-    		"page":         p,
-    		"limit":        size,
-    		"kw":           req.Keyword,
-    		"search_field": req.SearchField,
-    		"status":       req.Status,
-    	}
+		"page":         p,
+		"limit":        size,
+		"kw":           req.Keyword,
+		"search_field": req.SearchField,
+		"status":       req.Status,
+	}
 
 	ctx.HTML(http.StatusOK, "shippingaddresses_index.html", gin.H{
 		"status": "200",
@@ -68,7 +68,7 @@ func (this *CShippingAddresses) Edit(ctx *gin.Context) {
 			this.ErrorHtml(ctx, err.Error())
 		}
 		var language []model.Language
-		global.SHOP_DB.Model(model.Language{}).Find(&language)
+		global.SHOP_DB.Model(model.Language{}).Where("status=1").Find(&language)
 		// 查询权限列表
 		ctx.HTML(http.StatusOK, "shippingaddresses_form.html", gin.H{
 			"status":   "200",
@@ -119,7 +119,7 @@ func (this *CShippingAddresses) Add(ctx *gin.Context) {
 		// 查询权限列表
 		var models model.ShippingAddresses
 		var language []model.Language
-		global.SHOP_DB.Model(model.Language{}).Find(&language)
+		global.SHOP_DB.Model(model.Language{}).Where("status=1").Find(&language)
 		ctx.HTML(http.StatusOK, "shippingaddresses_form.html", gin.H{
 			"status":   "200",
 			"result":   models,

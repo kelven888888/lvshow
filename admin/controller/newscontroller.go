@@ -92,7 +92,7 @@ func (f *NewsController) Edit(ctx *gin.Context) {
 			}
 		}
 		var language []model.Language
-		global.SHOP_DB.Model(model.Language{}).Find(&language)
+		global.SHOP_DB.Model(model.Language{}).Where("status=1").Find(&language)
 		version := global.SHOP_CONFIG.System.Version
 		ctx.HTML(200, "news_edit.html", gin.H{
 			"news":     news,

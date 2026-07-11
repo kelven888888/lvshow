@@ -39,11 +39,11 @@ func (this *CGameLottyRecord) Index(ctx *gin.Context) {
 	result, count := this.Services.GetAll(req)
 
 	Search := map[string]interface{}{
-    		"page":         p,
-    		"limit":        size,
-    		"kw":           req.Keyword,
-    		"search_field": req.SearchField,
-    	}
+		"page":         p,
+		"limit":        size,
+		"kw":           req.Keyword,
+		"search_field": req.SearchField,
+	}
 
 	ctx.HTML(http.StatusOK, "gamelottyrecord_index.html", gin.H{
 		"status": "200",
@@ -67,7 +67,7 @@ func (this *CGameLottyRecord) Edit(ctx *gin.Context) {
 			this.ErrorHtml(ctx, err.Error())
 		}
 		var language []model.Language
-		global.SHOP_DB.Model(model.Language{}).Find(&language)
+		global.SHOP_DB.Model(model.Language{}).Where("status=1").Find(&language)
 		// 查询权限列表
 		ctx.HTML(http.StatusOK, "gamelottyrecord_form.html", gin.H{
 			"status":   "200",
@@ -118,7 +118,7 @@ func (this *CGameLottyRecord) Add(ctx *gin.Context) {
 		// 查询权限列表
 		var models model.GameLottyRecord
 		var language []model.Language
-		global.SHOP_DB.Model(model.Language{}).Find(&language)
+		global.SHOP_DB.Model(model.Language{}).Where("status=1").Find(&language)
 		ctx.HTML(http.StatusOK, "gamelottyrecord_form.html", gin.H{
 			"status":   "200",
 			"result":   models,

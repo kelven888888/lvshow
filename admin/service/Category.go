@@ -134,3 +134,33 @@ func (this *SCategory) InnerOrder(pid int, innerorder int) int {
 
 	return innerorder
 }
+
+// 获取权限分类
+func (this *SCategory) GetCategory(isTree ...bool) []*model.Category {
+	var Category []*model.Category
+	global.SHOP_DB.Find(&Category)
+
+	if len(isTree) > 0 {
+		Category = this.getTree(Category)
+	}
+
+	return Category
+}
+
+// 生成树分类
+func (this *SCategory) getTree(menus []*model.Category) []*model.Category {
+	tmpMap := make(map[int]*model.Category)
+	var tree []*model.Category
+	for _, menu := range menus {
+		tmpMap[menu.Id] = menu
+	}
+
+	for _, menu := range menus {
+		if _, ok := tmpMap[menu.Pid]; ok {
+			tmpMap[menu.Pid].Child = append(tmpMap[menu.Pid].Child, tmpMap[menu.Id])
+		} else {
+			tree = append(tree, tmpMap[menu.Id])
+		}
+	}
+	return tree
+}

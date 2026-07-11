@@ -135,7 +135,9 @@ func IninRoute() *gin.Engine {
 		router.InitOrdersShippingRoute(PrivateGroup)
 		router.InitOrderItemsShippingRoute(PrivateGroup)
 		router.InitWebNoticRoute(PrivateGroup)
-		router.InitShippingAddressesRoute(PrivateGroup)  
+		router.InitShippingAddressesRoute(PrivateGroup)
+		router.InitGoodsSpecGroupRoute(PrivateGroup)
+		router.InitGoodsSpecParamRoute(PrivateGroup)  
 //routeappend
 
 	}
@@ -275,7 +277,7 @@ func LoadTemplate(templatesDir string) multitemplate.Renderer {
 			}
 			content := make(map[string]string)
 			json.Unmarshal([]byte(values), &content)
-			return content[code]
+			return content["zh-cn"]
 		},
 		"qiuyu10": func(v int, values int) bool {
 			return v%values == 24

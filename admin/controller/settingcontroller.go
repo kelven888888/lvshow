@@ -58,7 +58,7 @@ func (h SettingController) Poster(ctx *gin.Context) {
 		}
 
 		var language []model.Language
-		global.SHOP_DB.Model(model.Language{}).Find(&language)
+		global.SHOP_DB.Model(model.Language{}).Where("status=1").Find(&language)
 
 		ctx.HTML(200, "setting_poster.html", gin.H{
 			"poster":   req,

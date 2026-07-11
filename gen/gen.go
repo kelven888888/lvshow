@@ -29,29 +29,9 @@ var sql string
 type Gen struct {
 }
 
-// go run .\main.go gen AccountTeamActivityLog 奖励日志 155  go run .\main.go gen Optionslog 期权日志 54
-// go run .\main.go gen AccountTeamActivityConfig 活动配置 903
-// go run .\main.go gen AccountTeamActivityAward 活动奖励 903
-// go run .\main.go gen PricePrediction 涨跌预测 118
-// go run .\main.go gen NewsMorningPaper 早晚报总结 118
-// go run main.go gen WalletChain 充提币渠道 6
-// go run main.go gen Goods 产品 54
-// go run main.go gen Playsetting 玩法配置 54
-// go run main.go gen UserStore 仓库 54
-// go run main.go gen GameLottyRecord 抽奖记录 54
-// go run main.go gen LevelUpdateLog 升级记录 54
-// go run main.go gen ExpRecord 经验记录 54
-// go run main.go gen Orders 订单 54
-// go run main.go gen OrderItems 订单详情 54
-// go run main.go gen PointRedeemRecord 积分兑换记录 54
-// go run main.go gen TbCoupon 优惠券 118
-// go run main.go gen TbCouponList 优惠券列表 118
-// go run main.go gen OrdersShipping 发货订单 54
-// go run main.go gen OrderItemsShipping 发货订单详情 54
-// go run main.go gen WebNotic 公告 6
-// go run main.go gen ShippingAddresses 收货地址 54
+// go run main.go gen GoodsSpecParam 商品规格参数 54
 func (this *Gen) Gener(types string, text string, pid string) {
-	var models model.ShippingAddresses
+	var models model.GoodsSpecParam
 	var modelrole, roles, roleinsert model.Role
 	global.SHOP_DB.Where("module=?", types).First(&modelrole)
 	addroute := true

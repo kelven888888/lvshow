@@ -200,7 +200,7 @@ func (this *UserController) Changepwd(ctx *gin.Context) {
 			fmt.Printf("login-request:%+v\n", adminUser)
 			global.SHOP_DB.First(&adminUser)
 			var language []model.Language
-			global.SHOP_DB.Model(model.Language{}).Find(&language)
+			global.SHOP_DB.Model(model.Language{}).Where("status=1").Find(&language)
 			var memberlevel []model.MemberLevel
 			global.SHOP_DB.Model(model.MemberLevel{}).Where("is_display=1").Find(&memberlevel)
 

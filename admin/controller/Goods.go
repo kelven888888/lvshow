@@ -67,7 +67,7 @@ func (this *CGoods) Edit(ctx *gin.Context) {
 			this.ErrorHtml(ctx, err.Error())
 		}
 		var language []model.Language
-		global.SHOP_DB.Model(model.Language{}).Find(&language)
+		global.SHOP_DB.Model(model.Language{}).Where("status=1").Find(&language)
 		var category []model.Category
 		global.SHOP_DB.Model(model.Category{}).Where("state=1").Find(&category)
 		// 查询权限列表
@@ -121,7 +121,7 @@ func (this *CGoods) Add(ctx *gin.Context) {
 		// 查询权限列表
 		var models model.Goods
 		var language []model.Language
-		global.SHOP_DB.Model(model.Language{}).Find(&language)
+		global.SHOP_DB.Model(model.Language{}).Where("status=1").Find(&language)
 		var category []model.Category
 		global.SHOP_DB.Model(model.Category{}).Where("state=1").Find(&category)
 		ctx.HTML(http.StatusOK, "goods_form.html", gin.H{

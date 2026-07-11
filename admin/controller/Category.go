@@ -68,7 +68,7 @@ func (this *CCategory) Edit(ctx *gin.Context) {
 		}
 		var language []model.Language
 
-		global.SHOP_DB.Model(model.Language{}).Find(&language)
+		global.SHOP_DB.Model(model.Language{}).Where("status=1").Find(&language)
 		var category []model.Category
 		global.SHOP_DB.Model(model.Category{}).Where("id !=? and pid!=? and state=1", result.Id, result.Id).Find(&category)
 		// 查询权限列表
@@ -123,7 +123,7 @@ func (this *CCategory) Add(ctx *gin.Context) {
 		var models model.Category
 		var category []model.Category
 		var language []model.Language
-		global.SHOP_DB.Model(model.Language{}).Find(&language)
+		global.SHOP_DB.Model(model.Language{}).Where("status=1").Find(&language)
 		global.SHOP_DB.Model(model.Category{}).Where("state=1").Find(&category)
 
 		ctx.HTML(http.StatusOK, "category_form.html", gin.H{

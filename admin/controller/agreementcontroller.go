@@ -97,7 +97,7 @@ func (ac *AgreementController) Edit(ctx *gin.Context) {
 		}
 
 		var language []model.Language
-		global.SHOP_DB.Model(model.Language{}).Find(&language)
+		global.SHOP_DB.Model(model.Language{}).Where("status=1").Find(&language)
 
 		ctx.HTML(200, "agreement_edit.html", gin.H{
 			"agreement": agreement,

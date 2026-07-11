@@ -18,6 +18,7 @@ type Category struct {
 	Children   *CategoryTrees `json:"children" gorm:"-"`
 	InnerOrder int            `gorm:"inner_order" json:"-"`
 	Level      int            `gorm:"level" json:"-"`
+	Child      []*Category    `gorm:"-"`
 }
 
 // CategoryTrees 二叉树列表
